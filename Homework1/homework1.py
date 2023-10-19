@@ -3,20 +3,21 @@ import os
 from pathlib import Path
 import shutil
 
-# Funkcja normalize
-def normalize(tekst):
-    slownik = str.maketrans('ĄąĆćĘęŁłÓóŚśŹźŻż', 'AaCcEeLlOoSsZzZz')
-    tekst = tekst.translate(slownik)
-    splitted_name = list(os.path.splitext(tekst))
-    normalized_tekst = ""
+# Normalize function
+def normalize(text):
+    dictionary = str.maketrans('ĄąĆćĘęŁłÓóŚśŹźŻż', 'AaCcEeLlOoSsZzZz')
+    text = text.translate(dictionary)
+    splitted_name = list(os.path.splitext(text))
+    normalized_text = ""
     for char in splitted_name[0]:
         if not char.isalnum():
             char = "_"
-        normalized_tekst +=char
-    splitted_name[0] = normalized_tekst
+        normalized_text +=char
+    splitted_name[0] = normalized_text
     file_name = "".join(splitted_name)
     return file_name
 
+# File extension dictionary
 folders_dict = {
     "audio" : ['.MP3', '.OGG', '.WAV', '.AMR'], 
     "documents" : ['.DOC', '.DOCX', '.TXT', '.PDF', '.XLSX', '.PPTX'], 
@@ -25,49 +26,50 @@ folders_dict = {
     "archives" : ['.ZIP', '.GZ', '.TAR'],
 }
 
-lista_plikow = []
-lista_znanych_rozszerzen = []
-lista_nieznanych_rozszerzen = []
+files_list = []
+known_extensions_list = []
+unknown_extensions_list = []
 
-def organizacja_plikow(p):
+# A function that organizes files in a folder
+def organize_files(p):
     
-    global folder_dict, lista_plikow, lista_znanych_rozszerzen, lista_nieznanych_rozszerzen
+    global folder_dict, files_list, known_extensions_list, unknown_extensions_list
 
-    # Tworzymy nowe foldery per typ
+    # We create new folders per type
     for folder_name in list(folders_dict.keys()):
         path_folder = Path(p, folder_name)
         try:
             path_folder.mkdir()
         except:
-            # Folder już istnieje
+            # The folder already exists
             continue
     
-    # Iteruję po każdym elemencie i zmieniam nazwę
+    # I iterate over each element and change the name
     for i in p.iterdir():
-        #  Zmiana nazwy pliku na znormalizowaną
+        #  Changing the file name to a normalized one
         new_name = i.name.replace(i.name, normalize(i.name))
         try:
             os.rename(Path(p,i.name), Path(p, new_name))
         except:
             continue
     
-    # Iteruję po każdym elemencie i robię porządki
+    # I iterate over each element and clean up
     for i in p.iterdir():       
         if i.name not in list(folders_dict.keys()):
-            # Jeżli obiekt to folder, to:
+            # If the object is a folder, then:
             if i.is_dir():
-                # Sprawdzenie, czy folder jest pusty
+                # Checking if the folder is empty
                 dir = Path(p,i.name)
                 if len(os.listdir(dir)) == 0: 
                     i.rmdir()
                 else:
-                    #wykonujemy tutaj rekurencję funkcji
-                    organizacja_plikow(dir)
-            # Jeżeli obiekt to plik, to:
+                    # I'm doing function recursion here
+                    organize_files(dir)
+            # If the object is a file, then:
             elif i.is_file():              
-                # Rozdzielenie nazwy pliku od rozszerzenia, celem pogrupowania pliku
+                # Separating the file name from the extension to group the file
                 splitted_name = list(os.path.splitext(i))
-                # Segregacja pliku
+                # File segregation
                 if splitted_name[1].upper() in folders_dict["audio"]:
                     shutil.move(Path(p, i.name), Path(p, "audio"))
                 elif splitted_name[1].upper() in folders_dict["documents"]:
@@ -80,29 +82,27 @@ def organizacja_plikow(p):
                     shutil.unpack_archive(Path(p, i.name), Path(p, i.stem))
                     shutil.move(Path(p, i.stem), Path(p,"archives"))
                     os.remove(Path(p, i.name))
-
                 else:
-                    lista_nieznanych_rozszerzen.append(str(i.suffix))
-                
-                # Wylistowanie
-                lista_plikow.append(str(i.name))
-                lista_znanych_rozszerzen.append(str(i.suffix))
+                    unknown_extensions_list.append(str(i.suffix))
+                # Listing
+                files_list.append(str(i.name))
+                known_extensions_list.append(str(i.suffix))
 
 
 path_to_organize = sys.argv[1]
 to_organize = Path(path_to_organize)
-organizacja_plikow(to_organize)
+organize_files(to_organize)
 
-# Wykaz wszystkich plikków
-if lista_plikow:
-    print(f"Wykaz wszystkich plików: {lista_plikow}\n")
-    if lista_znanych_rozszerzen:
-        print(f"Lista wszystkich znalezionych rozszerzeń: {set(lista_znanych_rozszerzen)}\n")
+# List of all files
+if files_list:
+    print(f"List of all files: {files_list}\n")
+    if known_extensions_list:
+        print(f"List of all extensions found: {set(known_extensions_list)}\n")
     else:
-        print("Lista wszystkich znalezionych rozszerzeń: 0\n")
-    if lista_nieznanych_rozszerzen:
-        print(f"Lista wszystkich nieznanyhch rozszerzeń: {set(lista_nieznanych_rozszerzen)}")
+        print("List of all extensions found: 0\n")
+    if unknown_extensions_list:
+        print(f"List of all unknown extensions: {set(unknown_extensions_list)}")
     else:
-        print("Lista wszystkich nieznanyhch rozszerzeń: 0\n")
+        print("List of all unknown extensions: 0\n")
 else:
-    print("Folder jest pusty")
+    print("The folder is empty.")
