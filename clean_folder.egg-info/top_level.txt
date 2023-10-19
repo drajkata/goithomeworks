@@ -1,6 +1,0 @@
-Homework1
-Homework2
-Tests
-build
-dist
-venv
