@@ -56,8 +56,9 @@ def func_add(args):
             user += arg + " "
         if arg.isdigit():
             value = arg
-    key = user.removesuffix(" ")   
-    if len(key) == 0:
+    if len(user) > 0:
+        key = user.removesuffix(" ")   
+    elif len(user) == 0:
         raise KeyError("To add a user, enter the 'add' command, then enter the username and phone number, separating the information with a space.")
     CONTACTS[key] = value
     text = "User added successfully.\n"
@@ -69,11 +70,12 @@ def func_change(args):
     value = "not specified"
     for arg in args:
         if arg not in OPERATIONS_MAP.keys() and not arg.isdigit():
-            user += arg + ""
+            user += arg + " "
         if arg.isdigit():
             value = arg
-    key = user.removesuffix(" ")   
-    if len(key) == 0:
+    if len(user) > 0:
+        key = user.removesuffix(" ")   
+    elif len(user) == 0:
         raise KeyError("To change a user, enter the 'change' command, then enter the username and phone number, separating the information with a space.")
     CONTACTS[key] = value
     text = "User number successfully changed.\n"
@@ -84,9 +86,10 @@ def func_phone(args):
     user = ""
     for arg in args:
         if arg not in OPERATIONS_MAP.keys() and not arg.isdigit():
-            user += arg + ""
-    key = user.removesuffix(" ")   
-    if len(key) == 0:
+            user += arg + " "
+    if len(user) > 0:
+        key = user.removesuffix(" ")   
+    elif len(user) == 0:
         raise KeyError("To display a user's phone number, enter the command 'phone', then enter the username, separating the information with a space.")
     value = CONTACTS[key]
     text = f"{key}'s phone number is: {value}\n"
