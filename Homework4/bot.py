@@ -30,7 +30,7 @@ def input_error(func):
         # except Exception as e:
             # print(f"Error caught: {e} in function {func.__name__} with values {args}")
         except KeyError as e:
-            return "User not found. Try again.\n"
+            return f"Username not provided or user not found. Try again.\n{str(e)}\n"
         except IndexError as e:
             return "Incorrect data has been entered. Try again.\n"
         except ValueError as e:
@@ -43,7 +43,7 @@ def func_hello(*args):
     return text
 
 @input_error
-def func_exit(args):
+def func_exit(*args):
     text = "Good bye!\n"
     return text
 
@@ -53,12 +53,12 @@ def func_add(args):
     value = "not specified"
     for arg in args:
         if arg not in OPERATIONS_MAP.keys() and not arg.isdigit():
-            user += arg + ""
+            user += arg + " "
         if arg.isdigit():
             value = arg
     key = user.removesuffix(" ")   
     if len(key) == 0:
-        raise KeyError
+        raise KeyError("To add a user, enter the 'add' command, then enter the username and phone number, separating the information with a space.")
     CONTACTS[key] = value
     text = "User added successfully.\n"
     return text
@@ -74,7 +74,7 @@ def func_change(args):
             value = arg
     key = user.removesuffix(" ")   
     if len(key) == 0:
-        raise KeyError
+        raise KeyError("To change a user, enter the 'change' command, then enter the username and phone number, separating the information with a space.")
     CONTACTS[key] = value
     text = "User number successfully changed.\n"
     return text
@@ -87,16 +87,18 @@ def func_phone(args):
             user += arg + ""
     key = user.removesuffix(" ")   
     if len(key) == 0:
-        raise KeyError
+        raise KeyError("To display a user's phone number, enter the command 'phone', then enter the username, separating the information with a space.")
     value = CONTACTS[key]
     text = f"{key}'s phone number is: {value}\n"
     return text
 
 @input_error
-def func_show(args):
+def func_show(*args):
     text = ""
     for key, value in CONTACTS.items():
         text +=  f"{key}: {value}\n"
+    if len(text) == 0:
+        text = "The contact book is empty.\n"
     return text
 
 OPERATIONS_MAP = {
@@ -113,15 +115,17 @@ OPERATIONS_MAP = {
 
 # I check which command I should execute
 @input_error
-def look_for_operation(list_of_words):
+def look_for_operation(words):
     command_not_found = True
     for command in OPERATIONS_MAP.keys():
-        check_command = " ".join(list_of_words).lower()
+        check_command = words.lower()
         if check_command.startswith(command):
             operation = OPERATIONS_MAP[command]
             command_not_found = False
     if command_not_found:
         raise ValueError 
+    list_of_words = words.split(" ")
+    # print(f"list_of_words: {list_of_words}")
     return operation(list_of_words)
 
 
@@ -130,10 +134,8 @@ CONTACTS = {}
 if __name__ == '__main__':
     print("Hello! I am your virtual assistant.\n")
     while True:
-        listen = input("Enter your command here: ")
-        list_listen = listen.split(" ")
-        # print(f"list_listen: {list_listen}")
-        operation = look_for_operation(list_listen)
+        listen = input("Enter your command here: ")       
+        operation = look_for_operation(listen)
         print(operation)
         if operation == "Good bye!\n":
             break
