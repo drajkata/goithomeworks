@@ -52,7 +52,7 @@ def func_add(args):
     user = ""
     value = "not specified"
     for arg in args:
-        if arg not in OPERATIONS_MAP.keys() and not arg.isdigit():
+        if arg.lower() not in OPERATIONS_MAP.keys() and not arg.isdigit():
             user += arg + " "
         if arg.isdigit():
             value = arg
@@ -69,7 +69,7 @@ def func_change(args):
     user = ""
     value = "not specified"
     for arg in args:
-        if arg not in OPERATIONS_MAP.keys() and not arg.isdigit():
+        if arg.lower() not in OPERATIONS_MAP.keys() and not arg.isdigit():
             user += arg + " "
         if arg.isdigit():
             value = arg
@@ -85,7 +85,7 @@ def func_change(args):
 def func_phone(args):
     user = ""
     for arg in args:
-        if arg not in OPERATIONS_MAP.keys() and not arg.isdigit():
+        if arg.lower() not in OPERATIONS_MAP.keys() and not arg.isdigit():
             user += arg + " "
     if len(user) > 0:
         key = user.removesuffix(" ")   
