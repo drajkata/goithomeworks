@@ -133,7 +133,7 @@ class Record:
     name: Name
     phone: Phone
     email: Email
-
+    
     def edit_phone(self, new_phone):
         self.phone = new_phone
         print(f"Phone number updated: {self.name} - {self.phone}")
