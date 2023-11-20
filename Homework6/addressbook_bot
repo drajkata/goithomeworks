@@ -17,8 +17,6 @@ class MyContactsIterator:
             key = self.keys[self.index]
             value = self.dictionary[key]
             self.index += 1
-            print(key)
-            print(value)
             yield key, value
         raise StopIteration
 
@@ -59,6 +57,12 @@ class AddressBook(UserDict):
         return wrapper
 
     @input_error
+    def check_value(self, value):
+        if value is None:
+            return ""
+        return value
+    
+    @input_error
     def func_hello(self):
         print("How can I help you?")
     
@@ -68,7 +72,7 @@ class AddressBook(UserDict):
             print('{:^120}'.format("-"*120))
             print('{:^30}|{:^30}|{:^30}|{:^30}'.format("Name", "Phone", "Email", "Birthday"))
             print('{:^120}'.format("-"*120))
-            print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2]))
+            print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, self.check_value(self.contacts[name][0]), self.check_value(self.contacts[name][1]), self.check_value(self.contacts[name][2])))
         else:
             raise Contact_not_found
     
@@ -81,7 +85,7 @@ class AddressBook(UserDict):
             print('{:^30}|{:^30}|{:^30}|{:^30}'.format("Name", "Phone", "Email", "Birthday"))
             print('{:^120}'.format("-"*120))
             for name, contact in self.contacts.items():
-                print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, contact[0], contact[1], contact[2]))
+                print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, self.check_value(contact[0]), self.check_value(contact[1]), self.check_value(contact[2])))
     
     @input_error
     def func_show(self, number_of_contacts):
@@ -98,7 +102,7 @@ class AddressBook(UserDict):
             for _ in range(number_of_contacts):
                 try:
                     name, contact = next(iterator)
-                    print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, contact[0], contact[1], contact[2]))
+                    print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, self.check_value(contact[0]), self.check_value(contact[1]), self.check_value(contact[2])))
                 except StopIteration:
                     break
             print('{:^120}'.format("-"*120))
@@ -119,7 +123,7 @@ class AddressBook(UserDict):
             print('{:^120}'.format("-"*120))
             print('{:^30}|{:^30}|{:^30}|{:^30}'.format("Name", "Phone", "Email", "Birthday"))
             print('{:^120}'.format("-"*120))
-            print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2]))
+            print('{:^30}|{:^30}|{:^30}|{:^30}'.format(name, self.check_value(self.contacts[name][0]), self.check_value(self.contacts[name][1]), self.check_value(self.contacts[name][2])))
 
     @input_error
     def func_birthday(self, name):
@@ -133,7 +137,7 @@ class AddressBook(UserDict):
     def func_edit_phone(self, name, new_phone):
         if name in self.contacts:
             contact = Record(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2])
-            contact.edit_phone(new_phone)
+            contact.edit_phone(Phone(new_phone)._value)
             self.contacts[contact.name][0] = contact.phone
         else:
             raise Contact_not_found
@@ -144,6 +148,15 @@ class AddressBook(UserDict):
             contact = Record(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2])
             contact.edit_email(new_email)
             self.contacts[contact.name][1] = contact.email
+        else:
+            raise Contact_not_found
+        
+    @input_error
+    def func_edit_birthday(self, name, new_birthday):
+        if name in self.contacts:
+            contact = Record(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2])
+            contact.edit_birthday(Birthday(new_birthday)._value)
+            self.contacts[contact.name][2] = contact.birthday
         else:
             raise Contact_not_found
 
@@ -170,6 +183,15 @@ class AddressBook(UserDict):
             contact = Record(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2])
             contact.delete_email()
             self.contacts[contact.name][1] = contact.email
+        else:
+            raise Contact_not_found
+        
+    @input_error
+    def func_delete_birthday(self, name):
+        if name in self.contacts:
+            contact = Record(name, self.contacts[name][0], self.contacts[name][1], self.contacts[name][2])
+            contact.delete_birthday()
+            self.contacts[contact.name][2] = contact.birthday
         else:
             raise Contact_not_found 
         
@@ -207,9 +229,12 @@ class Phone(Field):
         self._value = new_value
 
     def validate_phone(self, value):
-        validate_regex = r"^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$"
-        if re.match(validate_regex, value):
+        if len(value) == 0:
             return True
+        if value is not None:
+            validate_regex = r"^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$"
+            if re.match(validate_regex, value):
+                return True
         return False
 
 @dataclass
@@ -232,12 +257,19 @@ class Birthday(Field):
     def value(self, new_value):    
         if new_value is not None and not self.validate_birthday(new_value):
             raise ValueError("Incorrect data format, should be YYYY-MM-DD")
-        self._value = new_value
+        self._value = new_value           
 
     def validate_birthday(self, value):
         date_format = '%Y-%m-%d'
-        return datetime.strptime(value, date_format)
+        if len(value) == 0:
+            return True
+        try:
+            datetime.strptime(value, date_format)
+            return True
+        except:
+            return False
 
+   
 @dataclass
 class Record:
     name: Name
@@ -247,31 +279,42 @@ class Record:
     
     def edit_phone(self, new_phone):
         self.phone = new_phone
-        print(f"Phone number updated: {self.name} - {self.phone}")
+        print(f"Phone number updated for {self.name}")
 
     def edit_email(self, new_email):
         self.email = new_email
-        print(f"Email updated: {self.name} - {self.email}")
+        print(f"Email updated for {self.name}")
+
+    def edit_birthday(self, new_birthday):
+        self.birthday = new_birthday
+        print(f"Birthday updated for {self.name}")
 
     def delete_phone(self):
-        self.phone = ""
+        self.phone = None
         print(f"Phone number deleted for {self.name}")
 
     def delete_email(self):
-        self.email = ""
+        self.email = None
         print(f"Email deleted for {self.name}")
 
+    def delete_birthday(self):
+        self.birthday = None
+        print(f"Birthday deleted for {self.name}")
+
     def days_to_birthday(self, contact_name, contact_birthday):
-        current_datetime = datetime.now()
-        birthday_strptime = datetime.strptime(contact_birthday, '%Y-%m-%d')
-        birthday_date = datetime(current_datetime.year, birthday_strptime.month, birthday_strptime.day)
-        if current_datetime.date() == birthday_date.date():
-            print(f"Today is {contact_name}'s birthday!")
+        if contact_birthday is not None and len(contact_birthday) > 0:
+            current_datetime = datetime.now()
+            birthday_strptime = datetime.strptime(contact_birthday, '%Y-%m-%d')
+            birthday_date = datetime(current_datetime.year, birthday_strptime.month, birthday_strptime.day)
+            if current_datetime.date() == birthday_date.date():
+                print(f"Today is {contact_name}'s birthday!")
+            else:
+                if current_datetime.date() > birthday_date.date():
+                    birthday_date = datetime(current_datetime.year + 1, birthday_strptime.month, birthday_strptime.day)
+                to_birthday = (birthday_date - current_datetime).days
+                print(f"Days until {contact_name}'s birthday: {to_birthday}")
         else:
-            if current_datetime.date() > birthday_date.date():
-                birthday_date = datetime(current_datetime.year + 1, birthday_strptime.month, birthday_strptime.day)
-            to_birthday = (birthday_date - current_datetime).days
-            print(f"Days until {contact_name}'s birthday: {to_birthday}")
+            print(f"{contact_name} has no birthday entered in the address book.")
 
 def main():
     print("""
@@ -286,9 +329,11 @@ Choose one of the commands:
     - birthday - to display days to birthday of the user,
     - edit phone - to change phone of the user,
     - edit email - to change email of the user,
+    - edit birthday - to change birthday of the user,      
     - delete contact - to remove contact from Address Book
     - delete phone - to delete phone of the user,
     - delete email - to delete email of the user,
+    - delete birthday - to delete birthday of the user,
     - good bye, close, exit or . - to say good bye and close the program.
 After entering the command, you will be asked for additional information if needed to complete the command.""")
 
@@ -303,9 +348,11 @@ After entering the command, you will be asked for additional information if need
         "birthday" : addressbook.func_birthday,
         "edit phone" : addressbook.func_edit_phone,
         "edit email" : addressbook.func_edit_email,
+        "edit birthday" : addressbook.func_edit_birthday,
         "delete contact" : addressbook.func_delete_contact,
         "delete phone" : addressbook.func_delete_phone,
-        "delete email" : addressbook.func_delete_email,       
+        "delete email" : addressbook.func_delete_email,
+        "delete birthday" : addressbook.func_delete_birthday,      
         "good bye" : addressbook.func_exit,
         "close" : addressbook.func_exit,
         "exit" : addressbook.func_exit,
@@ -313,35 +360,41 @@ After entering the command, you will be asked for additional information if need
     }
 
     while True:
-        listen = input("\nEnter your command here: ")       
+        listen_enterred = input("\nEnter your command here: ")       
+        listen = listen_enterred.lower()
         
         if listen in OPERATIONS_MAP:
             if listen == "add":
                 name = input("Enter name: ")
                 phone = input("Enter phone: ")
                 email = input("Enter email: ")    
-                birthday = input("Enter birthday: ")       
+                birthday = input("Enter birthday: ")    
                 OPERATIONS_MAP[listen](name, phone, email, birthday)
 
-            elif listen in ["find","delete contact", "delete phone", "delete email", "birthday"]:
+            elif listen in ["find", "birthday", "delete contact", "delete phone", "delete email", "delete birthday"]:
                 name = input("Enter name: ")      
                 OPERATIONS_MAP[listen](name)
             
             elif listen == "edit phone":
-                name = input("Enter name of the contact to edit: ")
+                name = input("Enter name of the contact to edit phone: ")
                 new_phone = input("Enter new phone number: ")
                 OPERATIONS_MAP[listen](name, new_phone)
             
             elif listen == "edit email":
-                name = input("Enter name of the contact to edit: ")
+                name = input("Enter name of the contact to edit email: ")
                 new_email = input("Enter new email: ")
                 OPERATIONS_MAP[listen](name, new_email)
+
+            elif listen == "edit birthday":
+                name = input("Enter name of the contact to edit birthday: ")
+                new_birthday = input("Enter new birthday: ")
+                OPERATIONS_MAP[listen](name, new_birthday)
 
             elif listen == "show":
                 number_of_contacts = int(input("Enter number of contacts to display: "))
                 OPERATIONS_MAP[listen](number_of_contacts)
             else:
-                OPERATIONS_MAP[listen]()
+                OPERATIONS_MAP[listen.lower()]()
         else:
             print("Invalid command.")
 
