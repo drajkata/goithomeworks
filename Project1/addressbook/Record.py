@@ -23,7 +23,6 @@ class Name(Field):
         if new_value == "": self._value = None
         else: self._value = new_value
 
-
 @dataclass
 class Phone(Field):
     @property
@@ -102,7 +101,6 @@ class Address(Field):
         if new_value == "": self._value = None
         else: self._value = new_value
 
-
 @dataclass
 class Tag(Field):
     @property
@@ -113,7 +111,6 @@ class Tag(Field):
     def value(self, new_value):
         if new_value == "": self._value = None
         else: self._value = new_value
-
 
 @dataclass
 class Notes(Field):
@@ -142,31 +139,24 @@ class Record:
 
     def edit_name(self, new_name):
         self.name = new_name
-        print(f"Name updated successfully!")
     
     def edit_phone(self, new_phone):
         self.phone = new_phone
-        print(f"Phone number updated successfully!")
 
     def edit_email(self, new_email):
         self.email = new_email
-        print(f"Email updated successfully!")
 
     def edit_birthday(self, new_birthday):
         self.birthday = new_birthday
-        print(f"Birthday updated successfully!")
         
     def delete_phone(self):
         self.phone = None
-        print(f"Phone number deleted successfully!")
 
     def delete_email(self):
         self.email = None
-        print(f"Email deleted successfully!")
 
     def delete_birthday(self):
         self.birthday = None
-        print(f"Birthday deleted successfully!")
 
     def days_to_birthday(self, contact_name, contact_birthday):
         if contact_birthday is not None and len(contact_birthday) > 0:
@@ -191,24 +181,18 @@ class Record:
 
     def edit_address(self, new_address):
         self.address = new_address
-        print(f"Address updated successfully!")
 
     def delete_address(self):
         self.address = None
-        print(f"Address deleted successfully!")
 
     def edit_notes(self, new_notes):
         self.notes = new_notes
-        print(f"Notes updated successfully!")
 
     def delete_notes(self):
         self.notes = None
-        print(f"Notes deleted successfully!")
 
     def edit_tag(self, new_tag):
         self.tag = new_tag
-        print(f"Tag updated successfully!")
     
     def delete_tag(self):
         self.tag = None
-        print(f"Tag deleted successfully!")

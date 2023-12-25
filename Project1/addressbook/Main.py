@@ -131,7 +131,7 @@ def search(object):
 #### ADD FUNCTIONS
 
 @input_error
-def add_contact(object):
+def add(object):
     name = Name(input("Enter name: "))
     phone = Phone(input("Enter phone: "))
     email = Email(input("Enter email: "))
@@ -139,60 +139,54 @@ def add_contact(object):
     address = Address(input("Enter address: "))
     tag = Tag(input("Enter tag: "))
     notes = Notes(input("Enter notes: "))
-    object.func_add(name, phone, email, birthday, address, tag, notes)
+    object.add_contact(name, phone, email, birthday, address, tag, notes)
     object.save_to_file()
 
 ############################################################################  
 #### EDIT FUNCTIONS
 
 @input_error
-def edit_contact_name(object):
+def edit(object):
     contact_name = input("Which contact do you want to update (enter name)?: ")
-    new_name = Name(input("Enter new value: "))
-    object.func_edit_name(contact_name, new_name)
-    object.save_to_file()
-
-@input_error
-def edit_contact_phone(object):
-    contact_name = input("Which contact's phone do you want to update (enter name)?: ")
-    new_phone = Phone(input("Enter new value: "))
-    object.func_edit_phone(contact_name, new_phone)
-    object.save_to_file()
-
-@input_error
-def edit_contact_email(object):
-    contact_name = input("Which contact's email do you want to update (enter name)?: ")
-    new_email = Email(input("Enter new value: "))
-    object.func_edit_email(contact_name, new_email)
-    object.save_to_file()
-
-@input_error
-def edit_contact_birthday(object):
-    contact_name = input("Which contact's birthday do you want to update (enter name)?: ")
-    new_birthday = Birthday(input("Enter new value: "))
-    object.func_edit_birthday(contact_name, new_birthday)
-    object.save_to_file()
-
-@input_error
-def edit_contact_address(object):
-    contact_name = input("Which contact's address do you want to update (enter name)?: ")
-    new_address = Address(input("Enter new value: "))
-    object.func_edit_address(contact_name, new_address)
-    object.save_to_file()
-
-@input_error
-def edit_contact_tag(object):
-    contact_name = input("Which contact's tag do you want to update (enter name)?: ")
-    new_tag = Tag(input("Enter new value: "))
-    object.func_edit_tag(contact_name, new_tag)
-    object.save_to_file()
-
-@input_error
-def edit_contact_notes(object):
-    contact_name = input("Which contact's notes do you want to update (enter name)?: ")
-    new_notes = Notes(input("Enter new value: "))
-    object.func_edit_notes(contact_name, new_notes)
-    object.save_to_file()
+    contacts = object.check_if_object_exists(contact_name)
+    if len(contacts) == 0:
+            raise ContactNotFound
+    else:
+        print("\nI've found in the Address Book the contact(s) with the same name:")
+        DataPresentation.pretty_view_contacts(contacts)
+        choice = None
+        choice = input("\nWould you like to update the contact(s) with the information you entered? (Y/N): ")
+        if choice in ["y", "Y", "Yes", "yes", "True"]:
+            if len(contacts) > 1:
+                while True:
+                    number = None
+                    number = int(input("\nPlease enter the ID number of the contact you want to update: "))
+                    if number in contacts.keys():
+                        break
+                    else:
+                        print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
+                key = number
+                value = contacts[number]
+            else:
+                key = list(contacts.keys())[0]
+                value = list(contacts.values())[0]
+            print("\nComplete the information below that you want to update or skip by clicking Enter.")
+            name = Name(input("\nEnter new name: "))
+            phone = Phone(input("Enter new phone: "))
+            email = Email(input("Enter new email: "))
+            birthday = Birthday(input("Enter new birthday: "))
+            address = Address(input("Enter new address: "))
+            tag = Tag(input("Enter new tag: "))
+            notes = Notes(input("Enter new notes: "))
+            if object.check_entered_values(name, phone, email, birthday, address, tag, notes):
+                new_obj = object.edit_contact(contacts[number], name, phone, email, birthday, address, tag, notes)
+                object.save_to_file()
+                results_to_display = {}
+                results_to_display[key] = new_obj
+                DataPresentation.pretty_view_contacts(results_to_display)
+            else:
+                print("\nI've found in the Address Book the contact(s) with the same name, but you did not enter any data to change the contact information. Please try again.")
+        
 
 ############################################################################  
 #### DELETE FUNCTIONS
@@ -317,14 +311,8 @@ def main():
         "search": search,
         "birthday": contact_birthday,
         "upcoming birthdays": contacts_upcoming_birthday,
-        "add": add_contact,
-        "edit name" : edit_contact_name,
-        "edit phone" : edit_contact_phone,
-        "edit email" : edit_contact_email,
-        "edit birthday" : edit_contact_birthday,
-        "edit address" : edit_contact_address,
-        "edit tag" : edit_contact_tag,
-        "edit notes" : edit_contact_notes,
+        "add" : add,
+        "edit" : edit,
         "delete contact" : delete_contact,
         "delete phone" : delete_contact_phone,
         "delete email" : delete_contact_email,

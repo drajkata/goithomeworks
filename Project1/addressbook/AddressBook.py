@@ -68,7 +68,7 @@ class AddressBook(UserDict):
                     f"I'm sorry, but I don't understand your request. Try again.\nError details: {str(e)}\n"
                 )
             except ContactNotFound as e:
-                print(f"Contact not found.")
+                print("\nSorry, but I couldn't find any contacts with this name.")
             # except Exception as e:
             #     print(f"Error caught: {e} in function {func.__name__} with values {args}")
 
@@ -82,12 +82,21 @@ class AddressBook(UserDict):
 ### GENERAL FUNCTIONS
 
     @input_error
-    def check__entered_values(self, name, phone, email, birthday, address, tag, notes):
-        if phone.value is None and email.value is None and birthday.value is None and address.value is None and tag.value is None and notes.value is None:
-            #print("\nI've found in the Address Book the contact(s) with the same name, but you did not enter any data to change the contact information. Please try again.")
+    def check_entered_values(self, name = None, phone = None, email = None, birthday = None, address = None, tag = None, notes = None):
+        if name.value is None and phone.value is None and email.value is None and birthday.value is None and address.value is None and tag.value is None and notes.value is None:
             return False
         else: return True
     
+    @input_error
+    def check_if_object_exists(self, name):
+        results = {}
+        if any(str(obj.name).lower() == name.lower() for obj in self.contacts.values()):
+            for key, obj in self.contacts.items():
+                if str(obj.name).lower() == name.lower():
+                    results[key] = obj
+        return results
+
+
     @input_error
     def check_latest_id(self):
         list_of_id = []
@@ -201,8 +210,8 @@ After entering the command, you will be asked for additional information if need
 #### ADD FUNCTIONS
 
     @input_error
-    def func_add(self, name, phone, email, birthday, address, tag, notes):
-        new_values = {
+    def add_contact(self, name, phone, email, birthday, address, tag, notes):
+        values_tu_add = {
             "name" : name.value,
             "phone" : phone.value,
             "email" : email.value,
@@ -212,43 +221,36 @@ After entering the command, you will be asked for additional information if need
             "notes" : notes.value
             }
         to_add = False
-        results = {}
-        if any(obj.name == name.value for obj in self.contacts.values()):
-            if phone.value is None and email.value is None and birthday.value is None and address.value is None and tag.value is None and notes.value is None:
-                print("\nI've found in the Address Book the contact(s) with the same name, but you did not enter any data to change the contact information. Please try again.")
-            else:
-                for key, obj in self.contacts.items():
-                    if obj.name == name.value:
-                        results[key] = obj
+        corrected_values = self.check__entered_values(phone, email, birthday, address, tag, notes)
+        contacts = self.check_if_object_exists(name)
+        if len(contacts) == 0:
+            to_add = True
+        else:
+            if corrected_values:
                 print("\nI've found in the Address Book the contact(s) with the same name:")
-                DataPresentation.pretty_view_contacts(results)
+                DataPresentation.pretty_view_contacts(contacts)
                 choice = None
                 choice = input("\nWould you like to update the contact(s) with the information you entered? (Y/N): ")
                 if choice in ["y", "Y", "Yes", "yes", "True"]:
-                    if len(results) == 1:
-                        print("\nOf course! I've updated the contact with the entered data. Here is your contact:")       
-                        self.func_update_contact(obj, new_values)
-                        results_to_display = {}
-                        results_to_display[key] = obj
-                        DataPresentation.pretty_view_contacts(results_to_display)
-                    if len(results) > 1:
-                        print("\nOf course! ")
+                    if len(contacts) == 1:
+                        self.func_update_information(contacts[1], values_tu_add)
+                    else:
                         while True:
                             number = None
                             number = int(input("Please enter the ID number of the contact you want to update: "))
-                            if number in results.keys():
+                            if number in contacts.keys():
                                 print("\nI've updated the contact with the entered data. Here is your contact:")
-                                self.func_update_contact(results[number], new_values)
+                                self.func_update_information(contacts[number], values_tu_add)
                                 results_to_display = {}
-                                results_to_display[number] = results[number]
+                                results_to_display[number] = contacts[number]
                                 DataPresentation.pretty_view_contacts(results_to_display)
                                 break
                             else:
                                 print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
                 else:
-                    to_add = True
-        else:
-            to_add = True
+                    print("\nI took no action.")
+            else:
+                print("\nI've found in the Address Book the contact(s) with the same name, but you did not enter any data to change the contact information. Please try again.")
         if to_add == True:
             id = int(self.check_latest_id() + 1)
             new_contact = Record(name.value, phone.value, email.value, birthday.value, address.value, tag.value, notes.value)
@@ -262,78 +264,30 @@ After entering the command, you will be asked for additional information if need
 #### EDIT FUNCTIONS
     
     @input_error
-    def func_update_contact(self, contact_obj, new_values: dict):
-        if new_values["name"] : contact_obj.edit_name(new_values["name"]) // uncomment if needed
+    def func_update_information(self, contact_obj, new_values: dict):
+        if new_values["name"] : contact_obj.edit_name(new_values["name"])
         if new_values["phone"] : contact_obj.edit_phone(new_values["phone"])
         if new_values["email"] : contact_obj.edit_email(new_values["email"])
         if new_values["birthday"] : contact_obj.edit_birthday(new_values["birthday"])
         if new_values["address"] : contact_obj.edit_address(new_values["address"])
         if new_values["tag"] : contact_obj.edit_tag(new_values["tag"])
         if new_values["notes"] : contact_obj.edit_notes(new_values["notes"])
+
+    @input_error
+    def edit_contact(self, obj, name, phone, email, birthday, address, tag, notes):
+        values_tu_update = {
+            "name" : name.value,
+            "phone" : phone.value,
+            "email" : email.value,
+            "birthday" : birthday.value,
+            "address" : address.value,
+            "tag" : tag.value,
+            "notes" : notes.value
+            }
+        self.func_update_information(obj, values_tu_update)
+        return obj
+        
     
-    @input_error
-    def func_edit_name(self, contact_name, new_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.edit_name(new_name.value)
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_edit_phone(self, contact_name, new_phone):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.edit_phone(new_phone.value)
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_edit_email(self, contact_name, new_email):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.edit_email(new_email.value)
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_edit_birthday(self, contact_name, new_birthday):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.edit_birthday(new_birthday.value)
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_edit_address(self, contact_name, new_address):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.edit_address(new_address.value)
-        else:
-            raise ContactNotFound
-        
-    @input_error
-    def func_edit_tag(self, contact_name, new_tag):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts if obj.name == contact_name)
-            result.edit_tag(new_tag.value)
-        else:
-            raise ContactNotFound
-        
-    @input_error
-    def func_edit_notes(self, contact_name, new_notes):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.edit_notes(new_notes.value)
-        else:
-            raise ContactNotFound
-
 ############################################################################  
 #### DELETE FUNCTIONS
 

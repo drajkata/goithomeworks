@@ -9,7 +9,7 @@ def input_error(func):
         try:
             return func(*args)
         except ContactNotFound as e:
-            print(f"Contact not found.")
+            print("\nSorry, but I couldn't find any contacts with this name.")
         # except Exception as e:
         #     print(f"Error caught: {e} in function {func.__name__} with values {args}")
 
