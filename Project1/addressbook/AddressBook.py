@@ -1,12 +1,59 @@
-from collections import UserDict
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import pickle
 from pathlib import Path
 from TestData import TestData
 from Record import Record, Name, Phone, Email, Birthday, Address, Tag, Notes
-import DataPresentation
-from DataPresentation import ContactNotFound
+
+############################################################################      
+### ABSTRACT CLASS
+
+class AbstractAddressBook(ABC):
+    @abstractmethod
+    def save_data(self):
+        pass
+
+    @abstractmethod
+    def read_data(self):
+        pass
+
+    @abstractmethod
+    def help(self):
+        pass
+    
+    @abstractmethod
+    def add(self):
+        pass
+
+    @abstractmethod
+    def edit(self):
+        pass
+
+    @abstractmethod
+    def delete(self):
+        pass
+
+    @abstractmethod
+    def show(self):
+        pass
+
+    @abstractmethod
+    def show_per_page(self):
+        pass
+
+    @abstractmethod
+    def search(self):
+        pass
+
+    @abstractmethod
+    def find(self):
+        pass
+
+    @abstractmethod
+    def birthday(self):
+        pass
+
 
 ############################################################################      
 ### ITERATOR
@@ -29,17 +76,17 @@ class IteratorOfContacts:
 ### MAIN CLASS ADDRESSBOOK
 
 @dataclass
-class AddressBook(UserDict):
+class AddressBook(AbstractAddressBook):
     def __init__(self):
         self.counter: int
         self.filename = "contacts.bin"
         self.path = Path("./" + self.filename)
 
-    def save_to_file(self):
+    def save_data(self):
         with open(self.filename, "wb") as file:
             pickle.dump(self.contacts, file)
 
-    def read_from_file(self):
+    def read_data(self):
         if self.path.is_file() == False:
             test_data = TestData()
             self.contacts = test_data.test_contacts
@@ -173,7 +220,7 @@ After entering the command, you will be asked for additional information if need
 ### SEARCH FUNCTIONS
                 
     @input_error
-    def func_find(self, contact_name):
+    def find(self, contact_name):
         results_for_search = {}
         for key, obj in self.contacts.items():
             value = getattr(obj, "name")
@@ -182,7 +229,7 @@ After entering the command, you will be asked for additional information if need
         return results_for_search
 
     @input_error
-    def func_search(self, keyword):
+    def search(self, keyword):
         results_for_keyword = {}
         attributes_to_search = ["name", "phone", "email", "birthday", "address", "tag", "notes"]
         for key, obj in self.contacts.items():
@@ -197,7 +244,7 @@ After entering the command, you will be asked for additional information if need
 #### ADD FUNCTION
 
     @input_error
-    def add_contact(self, name, phone, email, birthday, address, tag, notes):
+    def add(self, name, phone, email, birthday, address, tag, notes):
         id = int(self.check_latest_id() + 1)
         new_contact = Record(name.value, phone.value, email.value, birthday.value, address.value, tag.value, notes.value)
         self.contacts[id] = new_contact
@@ -207,7 +254,7 @@ After entering the command, you will be asked for additional information if need
 #### EDIT FUNCTION
 
     @input_error
-    def edit_contact(self, contact_obj, name, phone, email, birthday, address, tag, notes):
+    def edit(self, contact_obj, name, phone, email, birthday, address, tag, notes):
         if name.value: contact_obj.edit_name(name.value)
         if phone.value : contact_obj.edit_phone(phone.value)
         if email.value : contact_obj.edit_email(email.value)
@@ -239,7 +286,7 @@ After entering the command, you will be asked for additional information if need
 #### BIRTHDAY FUNCTIONS   
 
     @input_error
-    def func_birthday(self, contact_name):
+    def birthday(self, contact_name):
         if any(obj.name == contact_name for obj in self.contacts.values()):
             result = None
             result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
@@ -248,7 +295,7 @@ After entering the command, you will be asked for additional information if need
             raise ContactNotFound
 
     @input_error
-    def func_upcoming_birthdays(self, days_str):
+    def upcoming_birthdays(self, days_str):
         def month_sort_key(date_str):
             date = datetime.strptime(date_str, "%d %B (%A)")
             current_month = datetime.now().month
@@ -298,7 +345,7 @@ After entering the command, you will be asked for additional information if need
             )
         if any(today_birthday.items()):
             print('Someone has birthday today, so wish "HAPPY BIRTHDAY" today to:')
-            DataPresentation.pretty_view_contacts(today_birthday)
+            View.pretty_view_contacts(today_birthday)
         if any(birthdays_dict.items()):
             print("\nSend birthday wishes to your contact on the upcoming days:")
-            DataPresentation.pretty_view_contacts(birthdays_dict)
+            View.pretty_view_contacts(birthdays_dict)

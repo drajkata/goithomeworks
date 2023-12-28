@@ -1,7 +1,6 @@
-from DataPresentation import ContactNotFound
 from AddressBook import AddressBook
 from Record import Record, Name, Phone, Email, Birthday, Address, Tag, Notes
-import DataPresentation
+import View
 
 # from thefuzz import fuzz
 
@@ -67,8 +66,6 @@ def input_error(func):
                 print(
                     f"I'm sorry, but I don't understand your request. Try again.\nError details: {str(e)}\n"
                 )
-            except ContactNotFound as e:
-                print(f"Contact not found.")
             # except Exception as e:
             #     print(f"Error caught: {e} in function {func.__name__} with values {args}")
 
@@ -101,7 +98,7 @@ def help(object):
 ### SHOW FUNCTIONS
 
 @input_error
-def show_all_contacts(object): DataPresentation.pretty_view_contacts(object.show())
+def show_all_contacts(object): View.display_contacts(View.ViewContacts(), object.show())
 
 @input_error
 def show_few_contacts(object):
@@ -115,7 +112,7 @@ def show_few_contacts(object):
         page, iter, contacts, is_last = object.show_per_page(number_of_contacts, new_counting, iter)
         new_counting = False 
         print(f"\nPAGE {page}")
-        DataPresentation.pretty_view_contacts(contacts)
+        View.display_contacts(View.ViewContacts(), contacts)
         if is_last:
             print("\nI've displayed all contacts in the Address Book.")
             break
@@ -127,7 +124,7 @@ def show_few_contacts(object):
                 break 
  
 @input_error
-def show_all_notes(object): DataPresentation.pretty_view_notes(object.func_show_all())
+def show_all_notes(object): View.display_contacts(View.ViewNotes(), object.show())
 
 ############################################################################      
 ### SEARCH FUNCTIONS
@@ -135,12 +132,13 @@ def show_all_notes(object): DataPresentation.pretty_view_notes(object.func_show_
 @input_error
 def find_contact(object):
     contact_name = input("Which contact do you want to display (enter name)?: ")
-    DataPresentation.pretty_view_contacts(object.func_find(contact_name))
+    View.display_contacts(View.ViewContact(), object.find(contact_name))
 
 @input_error
 def search(object):
     keyword = input("Enter keyword: ")
-    DataPresentation.pretty_view_contacts(object.func_search(keyword))
+    View.display_contacts(View.ViewContacts(), object.search(keyword))
+
 
 ############################################################################  
 #### ADD FUNCTION
@@ -153,7 +151,7 @@ def add_operation(object):
     contacts = object.check_if_object_exists(name)
     if len(contacts) > 0:
         print("\nI've found in the Address Book the contact(s) with the same name:")
-        DataPresentation.pretty_view_contacts(contacts)
+        View.display_contacts(View.ViewContacts(), contacts)
         choice = None
         choice = input("\nWould you like to update the contact? (Y/N): ")
         if choice in ["y", "Y", "Yes", "yes", "True"]:
@@ -182,15 +180,15 @@ def add_operation(object):
     notes = Notes(input("Enter new notes: "))
     if object.check_entered_values(name, phone, email, birthday, address, tag, notes):
         if to_add:   
-            new_contact = object.add_contact(name, phone, email, birthday, address, tag, notes)
-            object.save_to_file()
-            DataPresentation.pretty_view_contacts(new_contact)
+            new_contact = object.add(name, phone, email, birthday, address, tag, notes)
+            object.save_data()
+            View.display_contacts(View.ViewContacts(), new_contact)
         else:
-            obj_updated = object.edit_contact(value, name, phone, email, birthday, address, tag, notes)
-            object.save_to_file()
+            obj_updated = object.edit(value, name, phone, email, birthday, address, tag, notes)
+            object.save_data()
             results_to_display = {}
             results_to_display[key] = obj_updated
-            DataPresentation.pretty_view_contacts(results_to_display)
+            View.display_contacts(View.ViewContacts(), results_to_display)
     else:
         print("\nYou did not enter any data to change the contact information. Please try again.")
     
@@ -202,10 +200,10 @@ def edit_operation(object):
     contact_name = input("Which contact do you want to update (enter name)?: ")
     contacts = object.check_if_object_exists(contact_name)
     if len(contacts) == 0:
-            raise ContactNotFound
+            View.display_contacts(View.ViewContacts(), contacts)
     else:
         print("\nI've found in the Address Book the contact(s) with the same name:")
-        DataPresentation.pretty_view_contacts(contacts)
+        View.display_contacts(View.ViewContacts(), contacts)
         if len(contacts) > 1:
             while True:
                 number = None
@@ -228,11 +226,11 @@ def edit_operation(object):
         tag = Tag(input("Enter new tag: "))
         notes = Notes(input("Enter new notes: "))
         if object.check_entered_values(name, phone, email, birthday, address, tag, notes):
-            obj_updated = object.edit_contact(value, name, phone, email, birthday, address, tag, notes)
-            object.save_to_file()
+            obj_updated = object.edit(value, name, phone, email, birthday, address, tag, notes)
+            object.save_data()
             results_to_display = {}
             results_to_display[key] = obj_updated
-            DataPresentation.pretty_view_contacts(results_to_display)
+            View.display_contacts(View.ViewContacts(), results_to_display)
         else:
             print("\nYou did not enter any data to change the contact information. Please try again.")
 
@@ -252,11 +250,11 @@ def delete_operation(object):
     contact_name = input("\nPlease enter name of the contact?: ")
     contacts = object.check_if_object_exists(contact_name)
     if len(contacts) == 0:
-            DataPresentation.pretty_view_contacts(contacts)
+            View.display_contacts(View.ViewContacts(), contacts)
     else:
         if len(contacts) > 1:
             print("\nI've found in the Address Book the contact(s):")
-            DataPresentation.pretty_view_contacts(contacts)
+            View.display_contacts(View.ViewContacts(), contacts)
             while True:
                 number = None
                 number = int(input("\nPlease enter the ID number of the contact: "))
@@ -271,7 +269,7 @@ def delete_operation(object):
         choice = input("\nWould you like to delete the contact? (Y/N): ")
         if choice in ["y", "Y", "Yes", "yes", "True"]:
             object.delete(id, attribute_to_delete)
-            object.save_to_file()
+            object.save_data()
             print(f"\nThe operation was successful for contact: {contact_name} with id: {id}")
         else:
             print("\nI took no action.")
@@ -282,7 +280,7 @@ def delete_operation(object):
 @input_error
 def contact_birthday(object):
     contact_name = input("Which contact's birthday do you want to display (enter name)?: ")
-    object.func_birthday(contact_name)
+    object.birthday(contact_name)
 
 @input_error
 def contacts_upcoming_birthday(object):
@@ -293,7 +291,7 @@ def contacts_upcoming_birthday(object):
 #### EXIT FUNCTION
 
 def end_program(object):
-    object.save_to_file()
+    object.save_data()
     print("""
                                            ..::::------:::..                                           
                                  .:-=+*#%@@@@@@@@@@@@@@@@@@@@%##*+=:.                                  
@@ -343,7 +341,7 @@ def main():
     
     hello()
     contact = AddressBook()
-    contact.read_from_file()
+    contact.read_data()
     
     OPERATION_FUNCTIONS = {
         "help": help,
