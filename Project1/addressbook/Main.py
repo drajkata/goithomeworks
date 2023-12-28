@@ -95,24 +95,39 @@ To find out what can I do for you enter "help" command."""
     )
 
 def help(object):
-    object.func_help()
+    object.help()
 
 ############################################################################      
 ### SHOW FUNCTIONS
 
 @input_error
-def show_all_contacts(object): DataPresentation.pretty_view_contacts(object.func_show_all())
+def show_all_contacts(object): DataPresentation.pretty_view_contacts(object.show())
 
 @input_error
 def show_few_contacts(object):
+    iter = None
+    new_counting = True
     try:
         number_of_contacts = int(input("Enter number of contacts to display: "))
-        DataPresentation.pretty_view_contacts(object.func_show(number_of_contacts))
     except ValueError:
         print("Entered number is not an integer. Please try again.")
-
+    while True:        
+        page, iter, contacts, is_last = object.show_per_page(number_of_contacts, new_counting, iter)
+        new_counting = False 
+        print(f"\nPAGE {page}")
+        DataPresentation.pretty_view_contacts(contacts)
+        if is_last:
+            print("\nI've displayed all contacts in the Address Book.")
+            break
+        else:
+            choice = input(
+                f"\nDo you want to display next {number_of_contacts} contact(s)? (Y/N) "
+            )
+            if choice not in ["y", "Y", "Yes", "yes", "True"]:
+                break 
+ 
 @input_error
-def show_all_notes(object): DataPresentation.pretty_view_notes(object.func_show_notes())
+def show_all_notes(object): DataPresentation.pretty_view_notes(object.func_show_all())
 
 ############################################################################      
 ### SEARCH FUNCTIONS
@@ -128,35 +143,21 @@ def search(object):
     DataPresentation.pretty_view_contacts(object.func_search(keyword))
 
 ############################################################################  
-#### ADD FUNCTIONS
+#### ADD FUNCTION
 
 @input_error
-def add(object):
-    name = Name(input("Enter name: "))
-    phone = Phone(input("Enter phone: "))
-    email = Email(input("Enter email: "))
-    birthday = Birthday(input("Enter birthday: "))
-    address = Address(input("Enter address: "))
-    tag = Tag(input("Enter tag: "))
-    notes = Notes(input("Enter notes: "))
-    object.add_contact(name, phone, email, birthday, address, tag, notes)
-    object.save_to_file()
-
-############################################################################  
-#### EDIT FUNCTIONS
-
-@input_error
-def edit(object):
-    contact_name = input("Which contact do you want to update (enter name)?: ")
-    contacts = object.check_if_object_exists(contact_name)
-    if len(contacts) == 0:
-            raise ContactNotFound
-    else:
+def add_operation(object):
+    to_add = True
+    print("\nPlease complete the information below. Name is mandatory, but the rest you can skip by clicking Enter.")
+    name = Name(input("\nEnter name*: "))
+    contacts = object.check_if_object_exists(name)
+    if len(contacts) > 0:
         print("\nI've found in the Address Book the contact(s) with the same name:")
         DataPresentation.pretty_view_contacts(contacts)
         choice = None
-        choice = input("\nWould you like to update the contact(s) with the information you entered? (Y/N): ")
+        choice = input("\nWould you like to update the contact? (Y/N): ")
         if choice in ["y", "Y", "Yes", "yes", "True"]:
+            to_add = False
             if len(contacts) > 1:
                 while True:
                     number = None
@@ -164,74 +165,116 @@ def edit(object):
                     if number in contacts.keys():
                         break
                     else:
-                        print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
+                        print("\nSorry, but I couldn't find any contacts with this ID. Try again...\n")
                 key = number
                 value = contacts[number]
             else:
                 key = list(contacts.keys())[0]
                 value = list(contacts.values())[0]
             print("\nComplete the information below that you want to update or skip by clicking Enter.")
-            name = Name(input("\nEnter new name: "))
-            phone = Phone(input("Enter new phone: "))
-            email = Email(input("Enter new email: "))
-            birthday = Birthday(input("Enter new birthday: "))
-            address = Address(input("Enter new address: "))
-            tag = Tag(input("Enter new tag: "))
-            notes = Notes(input("Enter new notes: "))
-            if object.check_entered_values(name, phone, email, birthday, address, tag, notes):
-                new_obj = object.edit_contact(contacts[number], name, phone, email, birthday, address, tag, notes)
-                object.save_to_file()
-                results_to_display = {}
-                results_to_display[key] = new_obj
-                DataPresentation.pretty_view_contacts(results_to_display)
-            else:
-                print("\nI've found in the Address Book the contact(s) with the same name, but you did not enter any data to change the contact information. Please try again.")
-        
+        else:
+            print(f"\nContinue entering the information for new contact: {name.value}\n")
+    phone = Phone(input("Enter new phone: "))
+    email = Email(input("Enter new email: "))
+    birthday = Birthday(input("Enter new birthday: "))
+    address = Address(input("Enter new address: "))
+    tag = Tag(input("Enter new tag: "))
+    notes = Notes(input("Enter new notes: "))
+    if object.check_entered_values(name, phone, email, birthday, address, tag, notes):
+        if to_add:   
+            new_contact = object.add_contact(name, phone, email, birthday, address, tag, notes)
+            object.save_to_file()
+            DataPresentation.pretty_view_contacts(new_contact)
+        else:
+            obj_updated = object.edit_contact(value, name, phone, email, birthday, address, tag, notes)
+            object.save_to_file()
+            results_to_display = {}
+            results_to_display[key] = obj_updated
+            DataPresentation.pretty_view_contacts(results_to_display)
+    else:
+        print("\nYou did not enter any data to change the contact information. Please try again.")
+    
+############################################################################  
+#### EDIT FUNCTION
+
+@input_error
+def edit_operation(object):
+    contact_name = input("Which contact do you want to update (enter name)?: ")
+    contacts = object.check_if_object_exists(contact_name)
+    if len(contacts) == 0:
+            raise ContactNotFound
+    else:
+        print("\nI've found in the Address Book the contact(s) with the same name:")
+        DataPresentation.pretty_view_contacts(contacts)
+        if len(contacts) > 1:
+            while True:
+                number = None
+                number = int(input("\nPlease enter the ID number of the contact you want to update: "))
+                if number in contacts.keys():
+                    break
+                else:
+                    print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
+            key = number
+            value = contacts[number]
+        else:
+            key = list(contacts.keys())[0]
+            value = list(contacts.values())[0]
+        print("\nComplete the information below that you want to update or skip by clicking Enter.\n")
+        name = Name(input("Enter new name: "))
+        phone = Phone(input("Enter new phone: "))
+        email = Email(input("Enter new email: "))
+        birthday = Birthday(input("Enter new birthday: "))
+        address = Address(input("Enter new address: "))
+        tag = Tag(input("Enter new tag: "))
+        notes = Notes(input("Enter new notes: "))
+        if object.check_entered_values(name, phone, email, birthday, address, tag, notes):
+            obj_updated = object.edit_contact(value, name, phone, email, birthday, address, tag, notes)
+            object.save_to_file()
+            results_to_display = {}
+            results_to_display[key] = obj_updated
+            DataPresentation.pretty_view_contacts(results_to_display)
+        else:
+            print("\nYou did not enter any data to change the contact information. Please try again.")
 
 ############################################################################  
-#### DELETE FUNCTIONS
+#### DELETE FUNCTION
 
 @input_error
-def delete_contact(object):
-    contact_name = input("Which contact do you want to delete (enter name)?: ")
-    object.func_delete_contact(contact_name)
-    object.save_to_file()
-
-@input_error    
-def delete_contact_phone(object):
-    contact_name = input("Which contact's phone do you want to delete (enter name)?: ")
-    object.func_delete_phone(contact_name)
-    object.save_to_file()
-
-@input_error
-def delete_contact_email(object):
-    contact_name = input("Which contact's email do you want to delete (enter name)?: ")
-    object.func_delete_email(contact_name)
-    object.save_to_file()
-
-@input_error
-def delete_contact_birthday(object):
-    contact_name = input("Which contact's birthday do you want to delete (enter name)?: ")
-    object.func_delete_birthday(contact_name)
-    object.save_to_file()
-
-@input_error
-def delete_contact_address(object):
-    contact_name = input("Which contact's address do you want to delete (enter name)?: ")
-    object.func_delete_address(contact_name)
-    object.save_to_file()
-
-@input_error
-def delete_contact_tag(object):
-    contact_name = input("Which contact's tag do you want to delete (enter name)?: ")
-    object.func_delete_tag(contact_name)
-    object.save_to_file()
-
-@input_error
-def delete_contact_notes(object):
-    contact_name = input("Which contact's notes do you want to delete (enter name)?: ")
-    object.func_delete_notes(contact_name)
-    object.save_to_file()
+def delete_operation(object):
+    attributes = ['contact', 'phone', 'email', 'birthday', 'address', 'tag', 'notes']
+    print("\nOf course! Please enter, what would you like to delete:\n'contact', 'phone', 'email', 'birthday', 'address', 'tag', 'notes'")
+    while True:
+        attribute = input("\nYour choice: ")
+        attribute_to_delete = attribute.lower().strip()
+        if attribute_to_delete in attributes:
+            break
+        print("\nPlease enter the correct command.")
+    contact_name = input("\nPlease enter name of the contact?: ")
+    contacts = object.check_if_object_exists(contact_name)
+    if len(contacts) == 0:
+            DataPresentation.pretty_view_contacts(contacts)
+    else:
+        if len(contacts) > 1:
+            print("\nI've found in the Address Book the contact(s):")
+            DataPresentation.pretty_view_contacts(contacts)
+            while True:
+                number = None
+                number = int(input("\nPlease enter the ID number of the contact: "))
+                if number in contacts.keys():
+                    id = number
+                    break
+                else:
+                    print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
+        else:    
+            id = list(contacts.keys())[0]
+        choice = None
+        choice = input("\nWould you like to delete the contact? (Y/N): ")
+        if choice in ["y", "Y", "Yes", "yes", "True"]:
+            object.delete(id, attribute_to_delete)
+            object.save_to_file()
+            print(f"\nThe operation was successful for contact: {contact_name} with id: {id}")
+        else:
+            print("\nI took no action.")
 
 ############################################################################  
 #### BIRTHDAY FUNCTIONS  
@@ -311,15 +354,9 @@ def main():
         "search": search,
         "birthday": contact_birthday,
         "upcoming birthdays": contacts_upcoming_birthday,
-        "add" : add,
-        "edit" : edit,
-        "delete contact" : delete_contact,
-        "delete phone" : delete_contact_phone,
-        "delete email" : delete_contact_email,
-        "delete birthday" : delete_contact_birthday,
-        "delete address" : delete_contact_address,
-        "delete tag" : delete_contact_tag,
-        "delete notes" : delete_contact_notes,
+        "add" : add_operation,
+        "edit" : edit_operation,
+        "delete" : delete_operation,
         "good bye" : end_program, 
         "close" : end_program,
         "exit" : end_program,

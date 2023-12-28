@@ -90,12 +90,16 @@ class AddressBook(UserDict):
     @input_error
     def check_if_object_exists(self, name):
         results = {}
-        if any(str(obj.name).lower() == name.lower() for obj in self.contacts.values()):
-            for key, obj in self.contacts.items():
-                if str(obj.name).lower() == name.lower():
-                    results[key] = obj
+        contact_name = None
+        if isinstance(name, str):
+            contact_name = name
+        else:
+            contact_name = name.value
+        for key, obj in self.contacts.items():
+            value = getattr(obj, "name")
+            if contact_name.lower() in value.lower():
+                results[key] = obj
         return results
-
 
     @input_error
     def check_latest_id(self):
@@ -110,7 +114,7 @@ class AddressBook(UserDict):
 ############################################################################      
 ### HELP FUNCTIONS
     @input_error
-    def func_help(self):
+    def help(self):
         print("""
 What would you like to do with your Address Book?
 Choose one of the commands:
@@ -143,36 +147,27 @@ After entering the command, you will be asked for additional information if need
 ### SHOW FUNCTIONS
             
     @input_error
-    def func_show_all(self):
-        if len(self.contacts) == 0:
-            print("Address book is empty.")
-        else:
-            DataPresentation.pretty_view_contacts(self.contacts)
+    def show(self):
+        return self.contacts
 
     @input_error
-    def func_show(self, number_of_contacts):
-        iterator = iter(sorted(self.contacts.items(), key=lambda x: x[1].name))
-        
-        self.counter = 0
-        while True:
-            self.counter += 1
-            print(f"\nPAGE {self.counter}")
-            contacts_to_display = {}
+    def show_per_page(self, number_of_contacts, new_counting, iterator = None):
+        if new_counting == True:
+            self.counter = 0
+            iterator = iter(sorted(self.contacts.items(), key=lambda x: x[1].name))
+        is_last = False
+        contacts_to_display = {}
+        if self.counter * number_of_contacts < len(self.contacts):
             for _ in range(number_of_contacts):
                 try:
                     key, obj = next(iterator)
                     contacts_to_display[key] = obj
                 except StopIteration:
-                    break
-            DataPresentation.pretty_view_contacts(contacts_to_display)
-            if self.counter * number_of_contacts < len(self.contacts):
-                choice = input(
-                    f"\nDo you want to display next {number_of_contacts} contact(s)? (Y/N) "
-                )
-                if choice not in ["y", "Y", "Yes", "yes", "True"]:
-                    break
-            else:
-                break
+                    break        
+        self.counter += 1
+        if self.counter * number_of_contacts >= len(self.contacts):
+            is_last = True 
+        return self.counter, iterator, contacts_to_display, is_last
 
 ############################################################################      
 ### SEARCH FUNCTIONS
@@ -184,197 +179,61 @@ After entering the command, you will be asked for additional information if need
             value = getattr(obj, "name")
             if contact_name.lower() in value.lower():
                 results_for_search[key] = obj
-        if len(results_for_search) > 0:
-            DataPresentation.pretty_view_contacts(results_for_search)
-        else:
-            return None
+        return results_for_search
 
     @input_error
     def func_search(self, keyword):
         results_for_keyword = {}
         attributes_to_search = ["name", "phone", "email", "birthday", "address", "tag", "notes"]
-
         for key, obj in self.contacts.items():
             for attribute in attributes_to_search:
                 value = getattr(obj, attribute)
                 if keyword.lower() in value.lower():
                     results_for_keyword[key] = obj
                     break 
-        if len(results_for_keyword) > 0:
-            DataPresentation.pretty_view_contacts(results_for_keyword)
-        else:
-            return None
-
+        return results_for_keyword
 
 ############################################################################  
-#### ADD FUNCTIONS
+#### ADD FUNCTION
 
     @input_error
     def add_contact(self, name, phone, email, birthday, address, tag, notes):
-        values_tu_add = {
-            "name" : name.value,
-            "phone" : phone.value,
-            "email" : email.value,
-            "birthday" : birthday.value,
-            "address" : address.value,
-            "tag" : tag.value,
-            "notes" : notes.value
-            }
-        to_add = False
-        corrected_values = self.check__entered_values(phone, email, birthday, address, tag, notes)
-        contacts = self.check_if_object_exists(name)
-        if len(contacts) == 0:
-            to_add = True
-        else:
-            if corrected_values:
-                print("\nI've found in the Address Book the contact(s) with the same name:")
-                DataPresentation.pretty_view_contacts(contacts)
-                choice = None
-                choice = input("\nWould you like to update the contact(s) with the information you entered? (Y/N): ")
-                if choice in ["y", "Y", "Yes", "yes", "True"]:
-                    if len(contacts) == 1:
-                        self.func_update_information(contacts[1], values_tu_add)
-                    else:
-                        while True:
-                            number = None
-                            number = int(input("Please enter the ID number of the contact you want to update: "))
-                            if number in contacts.keys():
-                                print("\nI've updated the contact with the entered data. Here is your contact:")
-                                self.func_update_information(contacts[number], values_tu_add)
-                                results_to_display = {}
-                                results_to_display[number] = contacts[number]
-                                DataPresentation.pretty_view_contacts(results_to_display)
-                                break
-                            else:
-                                print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
-                else:
-                    print("\nI took no action.")
-            else:
-                print("\nI've found in the Address Book the contact(s) with the same name, but you did not enter any data to change the contact information. Please try again.")
-        if to_add == True:
-            id = int(self.check_latest_id() + 1)
-            new_contact = Record(name.value, phone.value, email.value, birthday.value, address.value, tag.value, notes.value)
-            self.contacts[id] = new_contact
-            print("\nI've added a contact to the address book with the following information:")
-            results_to_display = {}
-            results_to_display[id] = new_contact
-            DataPresentation.pretty_view_contacts(results_to_display)  
+        id = int(self.check_latest_id() + 1)
+        new_contact = Record(name.value, phone.value, email.value, birthday.value, address.value, tag.value, notes.value)
+        self.contacts[id] = new_contact
+        return dict(filter(lambda item: item[0] == id, self.contacts.items()))
 
 ############################################################################  
-#### EDIT FUNCTIONS
-    
-    @input_error
-    def func_update_information(self, contact_obj, new_values: dict):
-        if new_values["name"] : contact_obj.edit_name(new_values["name"])
-        if new_values["phone"] : contact_obj.edit_phone(new_values["phone"])
-        if new_values["email"] : contact_obj.edit_email(new_values["email"])
-        if new_values["birthday"] : contact_obj.edit_birthday(new_values["birthday"])
-        if new_values["address"] : contact_obj.edit_address(new_values["address"])
-        if new_values["tag"] : contact_obj.edit_tag(new_values["tag"])
-        if new_values["notes"] : contact_obj.edit_notes(new_values["notes"])
+#### EDIT FUNCTION
 
     @input_error
-    def edit_contact(self, obj, name, phone, email, birthday, address, tag, notes):
-        values_tu_update = {
-            "name" : name.value,
-            "phone" : phone.value,
-            "email" : email.value,
-            "birthday" : birthday.value,
-            "address" : address.value,
-            "tag" : tag.value,
-            "notes" : notes.value
-            }
-        self.func_update_information(obj, values_tu_update)
-        return obj
-        
+    def edit_contact(self, contact_obj, name, phone, email, birthday, address, tag, notes):
+        if name.value: contact_obj.edit_name(name.value)
+        if phone.value : contact_obj.edit_phone(phone.value)
+        if email.value : contact_obj.edit_email(email.value)
+        if birthday.value : contact_obj.edit_birthday(birthday.value)
+        if address.value : contact_obj.edit_address(address.value)
+        if tag.value : contact_obj.edit_tag(tag.value)
+        if notes.value : contact_obj.edit_notes(notes.value)
+        return contact_obj       
     
 ############################################################################  
-#### DELETE FUNCTIONS
+#### DELETE FUNCTION
 
     @input_error
-    def func_delete_contact(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            results = {}
-            for key, obj in self.contacts.items():
-                if obj.name == contact_name:
-                    results[key] = obj
-            print("\nI've found in the Address Book the following contact(s):")
-            DataPresentation.pretty_view_contacts(results)
-            choice = None
-            choice = input("\nWould you like to delete the contact(s)? (Y/N): ")
-            if choice in ["y", "Y", "Yes", "yes", "True"]:
-                if len(results) == 1:
-                    self.contacts.remove(key)
-                    print("\nOf course! I've deleted successfully the contact with the entered data.")  
-                if len(results) > 1:
-                    print("\nOf course! ")
-                    while True:
-                        number = None
-                        number = int(input("Please enter the ID number of the contact you want to delete: "))
-                        if number in results.keys():
-                            self.contacts.pop(number)
-                            print(f"\nI've deleted successfully the contact with id: {number}")
-                            break
-                        else:
-                            print("\nSorry, but I couldn't find any contacts with this ID. Try again...")
-            else:
-                print("\nI took no action.")
+    def delete(self, key, attr):
+        delete_operation = {
+            "phone" : self.contacts[key].delete_phone,
+            "email" : self.contacts[key].delete_email,
+            "birthday" : self.contacts[key].delete_birthday,
+            "address" : self.contacts[key].delete_address,
+            "tag" : self.contacts[key].delete_tag,
+            "notes" : self.contacts[key].delete_notes,
+        }
+        if attr in delete_operation:
+            delete_operation[attr]()
         else:
-            raise ContactNotFound
-
-    @input_error
-    def func_delete_phone(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.delete_phone()
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_delete_email(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.delete_email()
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_delete_birthday(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.delete_birthday()
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_delete_address(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.delete_address()
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_delete_tag(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.delete_tag()
-        else:
-            raise ContactNotFound
-
-    @input_error
-    def func_delete_notes(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.delete_notes()
-        else:
-            raise ContactNotFound
+            self.contacts.pop(key)
 
 ############################################################################  
 #### BIRTHDAY FUNCTIONS   
