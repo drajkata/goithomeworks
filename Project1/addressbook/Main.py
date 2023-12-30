@@ -2,53 +2,53 @@ from AddressBook import AddressBook
 from Record import Record, Name, Phone, Email, Birthday, Address, Tag, Notes
 import View
 
-# from thefuzz import fuzz
+from thefuzz import fuzz
 
 
-# def clossest_match(querry: str, commands):
-#     """filters commands if they start with querry,
-#     if no command found querry is shortened by one char from the end
-#     and function tries again (recursively)"""
-#     if len(querry) == 0:
-#         return []
-#     matched_commands = list(filter(lambda x: x.startswith(querry), commands))
-#     if len(matched_commands) > 0:
-#         return matched_commands
-#     else:
-#         return clossest_match(querry[:-1], commands)
+def clossest_match(querry: str, commands):
+    """filters commands if they start with querry,
+    if no command found querry is shortened by one char from the end
+    and function tries again (recursively)"""
+    if len(querry) == 0:
+        return []
+    matched_commands = list(filter(lambda x: x.startswith(querry), commands))
+    if len(matched_commands) > 0:
+        return matched_commands
+    else:
+        return clossest_match(querry[:-1], commands)
 
 
-# def command_hint(user_str: str, commands, threshold: int = 0) -> str:
-#     """return string with hint for user describing
-#     closest match to the available bot commands"""
-#     user_str = user_str.strip()
-#     hint = ""
-#     # for short string use startwith
-#     if len(user_str) <= 3:
-#         hits = clossest_match(user_str, commands)
-#     else:  # for longer strings use fuzzy string matching
-#         # calculate similarity scores for each command
-#         # ratio
-#         # scores = [fuzz.ratio(user_str, command) for command in commands]
-#         # partial
-#         # print(commands)
-#         scores = [fuzz.partial_ratio(user_str, command) for command in commands]
+def command_hint(user_str: str, commands, threshold: int = 0) -> str:
+    """return string with hint for user describing
+    closest match to the available bot commands"""
+    user_str = user_str.strip()
+    hint = ""
+    # for short string use startwith
+    if len(user_str) <= 3:
+        hits = clossest_match(user_str, commands)
+    else:  # for longer strings use fuzzy string matching
+        # calculate similarity scores for each command
+        # ratio
+        # scores = [fuzz.ratio(user_str, command) for command in commands]
+        # partial
+        # print(commands)
+        scores = [fuzz.partial_ratio(user_str, command) for command in commands]
 
-#         # threshold = 0
-#         scores = list(filter(lambda x: x >= threshold, scores))
-#         # print(scores)
-#         # find best score
-#         best_score = max(scores)
-#         # print(best_score)
-#         # find all commands with best scores
-#         hits = [
-#             command for score, command in zip(scores, commands) if score == best_score
-#         ]
-#         # print(hits)
+        # threshold = 0
+        scores = list(filter(lambda x: x >= threshold, scores))
+        # print(scores)
+        # find best score
+        best_score = max(scores)
+        # print(best_score)
+        # find all commands with best scores
+        hits = [
+            command for score, command in zip(scores, commands) if score == best_score
+        ]
+        # print(hits)
 
-#     if len(hits) > 0:
-#         hint = f"Did you mean?: {', '.join(hits)}"
-#     return hint
+    if len(hits) > 0:
+        hint = f"Did you mean?: {', '.join(hits)}"
+    return hint
 
 def input_error(func):
         def wrapper(*args):
@@ -280,7 +280,7 @@ def delete_operation(object):
 @input_error
 def contact_birthday(object):
     contact_name = input("Which contact's birthday do you want to display (enter name)?: ")
-    object.birthday(contact_name)
+    View.display_contacts(View.ViewContactBirthday(), object.birthday(contact_name))
 
 @input_error
 def contacts_upcoming_birthday(object):

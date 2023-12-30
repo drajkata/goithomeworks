@@ -148,7 +148,16 @@ class Record:
 
     def edit_birthday(self, new_birthday):
         self.birthday = new_birthday
-        
+    
+    def edit_address(self, new_address):
+        self.address = new_address
+
+    def edit_tag(self, new_tag):
+        self.tag = new_tag
+
+    def edit_notes(self, new_notes):
+        self.notes = new_notes
+
     def delete_phone(self):
         self.phone = None
 
@@ -158,15 +167,24 @@ class Record:
     def delete_birthday(self):
         self.birthday = None
 
-    def days_to_birthday(self, contact_name, contact_birthday):
-        if contact_birthday is not None and len(contact_birthday) > 0:
+    def delete_address(self):
+        self.address = None
+
+    def delete_tag(self):
+        self.tag = None
+
+    def delete_notes(self):
+        self.notes = None
+
+    def days_to_birthday(self, contact_birthday):
+        if contact_birthday is not None:
             current_datetime = datetime.now()
             birthday_strptime = datetime.strptime(contact_birthday, "%Y-%m-%d")
             birthday_date = datetime(
                 current_datetime.year, birthday_strptime.month, birthday_strptime.day
             )
             if current_datetime.date() == birthday_date.date():
-                print(f"Today is {contact_name}'s birthday!")
+                return "Today!"
             else:
                 if current_datetime.date() > birthday_date.date():
                     birthday_date = datetime(
@@ -175,24 +193,6 @@ class Record:
                         birthday_strptime.day,
                     )
                 to_birthday = (birthday_date - current_datetime).days
-                print(f"Days until {contact_name}'s birthday: {to_birthday}")
+                return to_birthday
         else:
-            print(f"{contact_name} has no birthday entered in the address book.")
-
-    def edit_address(self, new_address):
-        self.address = new_address
-
-    def delete_address(self):
-        self.address = None
-
-    def edit_notes(self, new_notes):
-        self.notes = new_notes
-
-    def delete_notes(self):
-        self.notes = None
-
-    def edit_tag(self, new_tag):
-        self.tag = new_tag
-    
-    def delete_tag(self):
-        self.tag = None
+            return None

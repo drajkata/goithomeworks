@@ -25,6 +25,7 @@ class AbstractView(ABC):
         pass
 
 class ViewContacts(AbstractView):
+    @input_error
     def display(self, data: dict):
         if data:
             pattern_headline = "| {:^5}| {:<25}| {:<15}| {:<30}| {:<15}| {:<60}|"
@@ -41,10 +42,12 @@ class ViewContacts(AbstractView):
                     check_value(obj.birthday), 
                     check_value(obj.address),
                     ))
+            print("{:^163}".format("-" * 163))
         else:
             raise ContactNotFound
 
 class ViewNotes(AbstractView):
+    @input_error
     def display(self, data: dict):
         if data:
             pattern_headline = "| {:^5}| {:<25}| {:<15}| {:<109}|"
@@ -59,10 +62,12 @@ class ViewNotes(AbstractView):
                     check_value(obj.tag),
                     check_value(obj.notes),
                     ))
+            print("\n{:^163}".format("-" * 163))
         else:
             raise ContactNotFound
         
 class ViewContact(AbstractView):
+    @input_error
     def display(self, data: dict):
         if data:
             pattern_headline = "| {:^5}| {:<25}| {:<15}| {:<30}| {:<15}| {:<60}| {:<25}|"
@@ -90,6 +95,28 @@ class ViewContact(AbstractView):
                     check_value(obj.notes),
                     ))
             print("{:^190}".format("-" * 190))
+        else:
+            raise ContactNotFound
+        
+class ViewContactBirthday(AbstractView):
+    @input_error
+    def display(self, data: dict):
+        if data:
+            pattern_headline = "| {:^5}| {:<25}| {:<15}| {:<30}| {:<15}| {:<17}|"
+            pattern_body = "| {:^5}| {:<25}| {:<15}| {:<30}| {:<15}| {:<17}|"
+            print("\n{:^120}".format("-" * 120))
+            print(pattern_headline.format("Id", "Name ^", "Phone", "Email", "Birthday", "Days to Birthday"))
+            print("{:^120}".format("-" * 120))
+            for key, obj in sorted(data.items(), key=lambda x: x[1][0].name):
+                print(pattern_body.format(
+                    key,
+                    check_value(obj[0].name), 
+                    check_value(obj[0].phone), 
+                    check_value(obj[0].email), 
+                    check_value(obj[0].birthday), 
+                    check_value(obj[1]),
+                    ))
+            print("{:^120}".format("-" * 120))
         else:
             raise ContactNotFound
 

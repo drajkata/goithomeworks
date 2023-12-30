@@ -11,15 +11,15 @@ from Record import Record, Name, Phone, Email, Birthday, Address, Tag, Notes
 
 class AbstractAddressBook(ABC):
     @abstractmethod
-    def save_data(self):
+    def help(self):
         pass
-
+    
     @abstractmethod
     def read_data(self):
         pass
 
     @abstractmethod
-    def help(self):
+    def save_data(self):
         pass
     
     @abstractmethod
@@ -114,15 +114,10 @@ class AddressBook(AbstractAddressBook):
                 print(
                     f"I'm sorry, but I don't understand your request. Try again.\nError details: {str(e)}\n"
                 )
-            except ContactNotFound as e:
-                print("\nSorry, but I couldn't find any contacts with this name.")
             # except Exception as e:
             #     print(f"Error caught: {e} in function {func.__name__} with values {args}")
 
         return wrapper
-
-    
-
 
 
 ############################################################################      
@@ -155,7 +150,6 @@ class AddressBook(AbstractAddressBook):
             list_of_id.append(key_id)
         max_ID = max(list_of_id)
         return max_ID
-
 
 
 ############################################################################      
@@ -235,7 +229,7 @@ After entering the command, you will be asked for additional information if need
         for key, obj in self.contacts.items():
             for attribute in attributes_to_search:
                 value = getattr(obj, attribute)
-                if keyword.lower() in value.lower():
+                if value is not None and keyword.lower() in value.lower():
                     results_for_keyword[key] = obj
                     break 
         return results_for_keyword
@@ -287,12 +281,11 @@ After entering the command, you will be asked for additional information if need
 
     @input_error
     def birthday(self, contact_name):
-        if any(obj.name == contact_name for obj in self.contacts.values()):
-            result = None
-            result = next(obj for obj in self.contacts.values() if obj.name == contact_name)
-            result.days_to_birthday(result.name, result.birthday)
-        else:
-            raise ContactNotFound
+        results_for_birthday = {}
+        for key, obj in self.contacts.items():
+            if obj.name.lower() == contact_name.lower():
+                results_for_birthday[key] = [obj, obj.days_to_birthday(obj.birthday)]
+        return results_for_birthday
 
     @input_error
     def upcoming_birthdays(self, days_str):

@@ -11,5 +11,5 @@ setup(
     license="MIT",
     packages=["alfred"],
     requires=["thefuzz"],
-    entry_points={"console_scripts": ["alfred=addressbook=Main"]},
+    entry_points={"console_scripts": ["alfred=addressbook:Main"]},
 )
