@@ -163,24 +163,13 @@ Choose one of the commands:
     - find - to find a contact by name,
     - search - to find a contact after entering keyword,
     - show all - to show all of your contacts from address book,
-    - show - to display N contacts from Address Book,
+    - show - to display N contacts from the Address Book,
     - show notes - to display contact name with tag and notes,
-    - add - to add new contact to Address Book,
-    - edit phone - to change phone of the user,
-    - edit email - to change email of the user,
-    - edit birthday - to change birthday of the user,
-    - edit address - to change address of the user,
-    - edit tag - to change tag of the user,
-    - edit notes - to change notes of the user,      
-    - delete contact - to remove contact from Address Book
-    - delete phone - to delete phone of the user,
-    - delete email - to delete email of the user,
-    - delete birthday - to delete birthday of the user,
-    - delete address - to delete address of the user, 
-    - delete tag - to delete tag of the user,
-    - delete notes - to delete notes of the user,
+    - add - to add new contact to the Address Book,
+    - edit - to modify attribute of the user,
+    - delete - to remove attribute of the user or remove contact from the Address Book
     - birthday - to display days to birthday of the user,
-    - upcoming birthdays - to check upcoming birthdays from your conatct in Address Book
+    - upcoming birthdays - to check upcoming birthdays from your conatct from the Address Book
     - good bye, close, exit or . - to say good bye and close the program.
 After entering the command, you will be asked for additional information if needed to complete the command.""")
 

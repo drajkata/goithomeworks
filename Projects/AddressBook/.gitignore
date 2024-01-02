@@ -1,0 +1,9 @@
+# Byte-compiled / optimized / DLL files
+classes/__pycache__/
+address_book/__pycache__/
+address_book/build/
+address_book/*.egg-info
+address_book/contacts.bin
+build/
+*.egg-info/
+contacts.bin
