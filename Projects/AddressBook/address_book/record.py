@@ -7,7 +7,7 @@ import re
 
 @dataclass
 class Field:
-    value: str = None
+    value: None
 
 ############################################################################      
 ### CLASSES INHERITING FROM THE FIELD CLASS
@@ -22,6 +22,24 @@ class Name(Field):
     def value(self, new_value):
         if new_value == "": self._value = None
         else: self._value = new_value
+
+    def __eq__(self, other): 
+        return self.value == other.value and self.value == other.value  
+    
+    def __ne__(self, other): 
+        return self.value != other.value or self.value != other.value
+    
+    def __lt__(self, other): 
+        return self.value < other.value and self.value < other.value   
+        
+    def __gt__(self, other): 
+        return self.value > other.value and self.value > other.value
+    
+    def __le__(self, other): 
+        return self.value <= other.value and self.value <= other.value   
+ 
+    def __ge__(self, other): 
+        return self.value >= other.value and self.value >= other.value
 
 @dataclass
 class Phone(Field):

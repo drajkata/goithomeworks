@@ -9,7 +9,8 @@ setup(
     author_email="katarzyna.drajok@gmail.com; katarzyna.czempiel@gmail.com; rafal.radx@gmail.com; dawid.radzimski@gmail.com; adr.karwat@gmail.com",
     readme="README.md",
     license="MIT",
-    packages=["alfred"],
+    package_data={"package_c-stubs": ["__init__.pyi", "lib.pyi"]},
+    packages=["alfred", "package_c-stubs"],
     requires=["thefuzz"],
     entry_points={"console_scripts": ["alfred=addressbook:Main"]},
 )

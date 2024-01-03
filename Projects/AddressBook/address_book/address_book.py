@@ -139,7 +139,7 @@ class AddressBook(AbstractAddressBook):
             contact_name = name.value
         for key, obj in self.contacts.items():
             value = getattr(obj, "name")
-            if contact_name.lower() in value.lower():
+            if contact_name.lower() in value.value.lower():
                 results[key] = obj
         return results
 
@@ -237,14 +237,14 @@ After entering the command, you will be asked for additional information if need
 #### EDIT FUNCTION
 
     @input_error
-    def edit(self, contact_obj, name, phone, email, birthday, address, tag, notes):
-        if name.value: contact_obj.edit_name(name.value)
-        if phone.value : contact_obj.edit_phone(phone.value)
-        if email.value : contact_obj.edit_email(email.value)
-        if birthday.value : contact_obj.edit_birthday(birthday.value)
-        if address.value : contact_obj.edit_address(address.value)
-        if tag.value : contact_obj.edit_tag(tag.value)
-        if notes.value : contact_obj.edit_notes(notes.value)
+    def edit(self, contact_obj, name: Name, phone: Phone, email: Email, birthday: Birthday, address: Address, tag: Tag, notes: Notes):
+        if name: contact_obj.edit_name(name)
+        if phone : contact_obj.edit_phone(phone)
+        if email : contact_obj.edit_email(email)
+        if birthday : contact_obj.edit_birthday(birthday)
+        if address : contact_obj.edit_address(address)
+        if tag : contact_obj.edit_tag(tag)
+        if notes : contact_obj.edit_notes(notes)
         return contact_obj       
     
 ############################################################################  

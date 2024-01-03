@@ -33,14 +33,14 @@ class ViewContacts(AbstractView):
             print("\n{:^163}".format("-" * 163))
             print(pattern_headline.format("Id", "Name ^", "Phone", "Email", "Birthday", "Address"))
             print("{:^163}".format("-" * 163))
-            for key, obj in sorted(data.items(), key=lambda x: x[1].name):
+            for id, obj in sorted(data.items(), key=lambda x: x[1].name.value):
                 print(pattern_body.format(
-                    key,
-                    check_value(obj.name), 
-                    check_value(obj.phone), 
-                    check_value(obj.email), 
-                    check_value(obj.birthday), 
-                    check_value(obj.address),
+                    id,
+                    check_value(obj.name.value), 
+                    check_value(obj.phone.value), 
+                    check_value(obj.email.value), 
+                    check_value(obj.birthday.value), 
+                    check_value(obj.address.value),
                     ))
             print("{:^163}".format("-" * 163))
         else:
@@ -55,12 +55,12 @@ class ViewNotes(AbstractView):
             print("\n{:^163}".format("-" * 163))
             print(pattern_headline.format("Id", "Name ^", "Tag", "Notes"))
             print("{:^163}".format("-" * 163))
-            for key, obj in sorted(data.items(), key=lambda x: x[1].name):
+            for id, obj in sorted(data.items(), key=lambda x: x[1].name.value):
                 print(pattern_body.format(
-                    key,
-                    check_value(obj.name), 
-                    check_value(obj.tag),
-                    check_value(obj.notes),
+                    id,
+                    check_value(obj.name.value), 
+                    check_value(obj.tag.value),
+                    check_value(obj.notes.value),
                     ))
             print("\n{:^163}".format("-" * 163))
         else:
@@ -75,22 +75,22 @@ class ViewContact(AbstractView):
             print("\n{:^190}".format("-" * 190))
             print(pattern_headline.format("Id", "Name ^", "Phone", "Email", "Birthday", "Address", "Tag"))
             print("{:^190}".format("-" * 190))
-            for key, obj in sorted(data.items(), key=lambda x: x[1].name):
+            for id, obj in sorted(data.items(), key=lambda x: x[1].name.value):
                 print(pattern_body.format(
-                    key,
-                    check_value(obj.name), 
-                    check_value(obj.phone), 
-                    check_value(obj.email), 
-                    check_value(obj.birthday), 
-                    check_value(obj.address),
-                    check_value(obj.tag),
+                    id,
+                    check_value(obj.name.value), 
+                    check_value(obj.phone.value), 
+                    check_value(obj.email.value), 
+                    check_value(obj.birthday.value), 
+                    check_value(obj.address.value),
+                    check_value(obj.tag.value),
                     ))
             pattern_headline = "| {:<186} |"
             pattern_body = "| {:<186} |"
             print("{:^190}".format("-" * 190))
             print(pattern_headline.format("Notes"))
             print("{:^190}".format("-" * 190))
-            for key, obj in sorted(data.items(), key=lambda x: x[1].name):
+            for obj in sorted(data.values(), key=lambda x: x[0].name.value):
                 print(pattern_body.format(
                     check_value(obj.notes),
                     ))
@@ -107,13 +107,13 @@ class ViewContactBirthday(AbstractView):
             print("\n{:^120}".format("-" * 120))
             print(pattern_headline.format("Id", "Name ^", "Phone", "Email", "Birthday", "Days to Birthday"))
             print("{:^120}".format("-" * 120))
-            for key, obj in sorted(data.items(), key=lambda x: x[1][0].name):
+            for id, obj in sorted(data.items(), key=lambda x: x[1][0].name.value):
                 print(pattern_body.format(
-                    key,
-                    check_value(obj[0].name), 
-                    check_value(obj[0].phone), 
-                    check_value(obj[0].email), 
-                    check_value(obj[0].birthday), 
+                    id,
+                    check_value(obj[0].name.value), 
+                    check_value(obj[0].phone.value), 
+                    check_value(obj[0].email.value), 
+                    check_value(obj[0].birthday.value), 
                     check_value(obj[1]),
                     ))
             print("{:^120}".format("-" * 120))
