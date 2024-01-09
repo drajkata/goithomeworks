@@ -72,10 +72,12 @@ class ViewContact(AbstractView):
         if data:
             pattern_headline = "| {:^5}| {:<25}| {:<15}| {:<30}| {:<15}| {:<60}| {:<25}|"
             pattern_body = "| {:^5}| {:<25}| {:<15}| {:<30}| {:<15}| {:<60}| {:<25}|"
-            print("\n{:^190}".format("-" * 190))
-            print(pattern_headline.format("Id", "Name ^", "Phone", "Email", "Birthday", "Address", "Tag"))
-            print("{:^190}".format("-" * 190))
+            pattern_notes ="| {:<186} |"
+            
             for id, obj in sorted(data.items(), key=lambda x: x[1].name.value):
+                print("\n{:^190}".format("-" * 190))
+                print(pattern_headline.format("Id", "Name ^", "Phone", "Email", "Birthday", "Address", "Tag"))
+                print("{:^190}".format("-" * 190))
                 print(pattern_body.format(
                     id,
                     check_value(obj.name.value), 
@@ -85,16 +87,11 @@ class ViewContact(AbstractView):
                     check_value(obj.address.value),
                     check_value(obj.tag.value),
                     ))
-            pattern_headline = "| {:<186} |"
-            pattern_body = "| {:<186} |"
-            print("{:^190}".format("-" * 190))
-            print(pattern_headline.format("Notes"))
-            print("{:^190}".format("-" * 190))
-            for obj in sorted(data.values(), key=lambda x: x[0].name.value):
-                print(pattern_body.format(
-                    check_value(obj.notes),
-                    ))
-            print("{:^190}".format("-" * 190))
+                print("{:^190}".format("-" * 190))
+                print(pattern_notes.format("Notes"))
+                print("{:^190}".format("-" * 190))
+                print(pattern_notes.format(check_value(obj.notes.value)))
+                print("{:^190}\n".format("-" * 190))
         else:
             raise ContactNotFound
         

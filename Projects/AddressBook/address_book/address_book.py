@@ -130,16 +130,13 @@ class AddressBook(AbstractAddressBook):
         else: return True
     
     @input_error
-    def check_if_object_exists(self, name):
+    def check_if_object_exists(self, contact_name):
         results = {}
-        contact_name = None
-        if isinstance(name, str):
-            contact_name = name
-        else:
-            contact_name = name.value
+        if not isinstance(contact_name, str):
+            contact_name = contact_name.value
         for key, obj in self.contacts.items():
-            value = getattr(obj, "name")
-            if contact_name.lower() in value.value.lower():
+            obj_name = getattr(obj, "name")
+            if contact_name.lower() in obj_name.value.lower():
                 results[key] = obj
         return results
 
@@ -206,8 +203,8 @@ After entering the command, you will be asked for additional information if need
     def find(self, contact_name):
         results_for_search = {}
         for key, obj in self.contacts.items():
-            value = getattr(obj, "name")
-            if contact_name.lower() in value.lower():
+            name = getattr(obj, "name")
+            if contact_name.lower() in name.value.lower():
                 results_for_search[key] = obj
         return results_for_search
 
@@ -217,8 +214,8 @@ After entering the command, you will be asked for additional information if need
         attributes_to_search = ["name", "phone", "email", "birthday", "address", "tag", "notes"]
         for key, obj in self.contacts.items():
             for attribute in attributes_to_search:
-                value = getattr(obj, attribute)
-                if value is not None and keyword.lower() in value.lower():
+                contact = getattr(obj, attribute)
+                if contact.value is not None and keyword.lower() in contact.value.lower():
                     results_for_keyword[key] = obj
                     break 
         return results_for_keyword
@@ -227,9 +224,9 @@ After entering the command, you will be asked for additional information if need
 #### ADD FUNCTION
 
     @input_error
-    def add(self, name, phone, email, birthday, address, tag, notes):
+    def add(self, name: Name, phone: Phone, email: Email, birthday: Birthday, address: Address, tag: Tag, notes: Notes):
         id = int(self.check_latest_id() + 1)
-        new_contact = Record(name.value, phone.value, email.value, birthday.value, address.value, tag.value, notes.value)
+        new_contact = Record(name, phone, email, birthday, address, tag, notes)
         self.contacts[id] = new_contact
         return dict(filter(lambda item: item[0] == id, self.contacts.items()))
 

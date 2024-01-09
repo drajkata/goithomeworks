@@ -389,7 +389,10 @@ def main():
         if command in OPERATION_FUNCTIONS:
             OPERATION_FUNCTIONS[command](contact)       
         else:
-            print("Invalid command.")
-
+            hint_for_user = command_hint(listen, OPERATION_FUNCTIONS.keys())
+            if hint_for_user:  # not empty string
+                print(hint_for_user)
+            else:
+                print("Invalid command.")
 if __name__ == "__main__":
     main()
