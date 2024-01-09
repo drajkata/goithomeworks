@@ -3,10 +3,9 @@
 1. **Clone the Repository:**
 
    - Clone this repository into a folder of choice on your local machine using the following command:
-
-   ```
-   git clone https://github.com/drajkata/goithomeworks/tree/main/Projects/AddressBook
-   ```
+     ```
+     git clone https://github.com/drajkata/goithomeworks/tree/main/Projects/AddressBook
+     ```
 
 2. **Install pipenv:**
 
