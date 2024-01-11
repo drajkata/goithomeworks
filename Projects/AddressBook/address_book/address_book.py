@@ -5,7 +5,7 @@ import pickle
 from pathlib import Path
 from test_data import TestData
 from record import Record, Name, Phone, Email, Birthday, Address, Tag, Notes
-import view
+
 
 ############################################################################      
 ### ABSTRACT CLASS
@@ -235,13 +235,13 @@ After entering the command, you will be asked for additional information if need
 
     @input_error
     def edit(self, contact_obj, name: Name, phone: Phone, email: Email, birthday: Birthday, address: Address, tag: Tag, notes: Notes):
-        if name: contact_obj.edit_name(name)
-        if phone : contact_obj.edit_phone(phone)
-        if email : contact_obj.edit_email(email)
-        if birthday : contact_obj.edit_birthday(birthday)
-        if address : contact_obj.edit_address(address)
-        if tag : contact_obj.edit_tag(tag)
-        if notes : contact_obj.edit_notes(notes)
+        if name.value: contact_obj.edit_name(name)
+        if phone.value : contact_obj.edit_phone(phone)
+        if email.value : contact_obj.edit_email(email)
+        if birthday.value : contact_obj.edit_birthday(birthday)
+        if address.value : contact_obj.edit_address(address)
+        if tag.value : contact_obj.edit_tag(tag)
+        if notes.value : contact_obj.edit_notes(notes)
         return contact_obj       
     
 ############################################################################  
@@ -269,8 +269,8 @@ After entering the command, you will be asked for additional information if need
     def birthday(self, contact_name):
         results_for_birthday = {}
         for key, obj in self.contacts.items():
-            if obj.name.lower() == contact_name.lower():
-                results_for_birthday[key] = [obj, obj.days_to_birthday(obj.birthday)]
+            if obj.name.value.lower() == contact_name.lower():
+                results_for_birthday[key] = [obj, obj.days_to_birthday(obj.birthday.value)]
         return results_for_birthday
 
     @input_error
@@ -292,8 +292,8 @@ After entering the command, you will be asked for additional information if need
 
         for key, obj in self.contacts.items():
             
-            if obj.birthday is not None:
-                birthday = datetime.strptime(obj.birthday, "%Y-%m-%d").date()
+            if obj.birthday.value is not None:
+                birthday = datetime.strptime(obj.birthday.value, "%Y-%m-%d").date()
 
                 birthday_this_year = birthday.replace(year=today.year)
                 birthday_next_year = birthday.replace(year=today.year + 1)

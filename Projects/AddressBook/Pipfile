@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-thefuzz = "*"
+thefuzz = "==0.20"
 
 [dev-packages]
 mypy = "*"
