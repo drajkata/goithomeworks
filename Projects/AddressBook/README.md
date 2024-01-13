@@ -109,4 +109,4 @@ Please, firstly run above instructions to activate virtual environment with pipe
 
 **Example of restarting the program from the beginning**
 
-[Docker_example](https://github.com/drajkata/goithomeworks/blob/main/Projects/AddressBook/Docker_example.png)
+[Docker_example](./Docker_example.png)
