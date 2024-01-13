@@ -1,4 +1,4 @@
-## Setup
+## Stage 1 - Setup pipenv
 
 1. **Clone the Repository:**
 
@@ -55,3 +55,55 @@
      ```
      pipenv --where
      ```
+
+## Stage 2 - Setup docker
+
+Please, firstly run above instrustions to activate virtual environment with pipenv. Then go through instructions below.
+
+1. **Creating an image**
+
+- To create an image use the following command:
+
+  ```
+  docker build . -t drajkata/hm_address_book
+  # you can name your imaga in a different way for example my_app or with flag -t [your_profile_in_docker_hub]/[name_of_your_up]
+  ```
+
+- To check your images use the following command:
+  ```
+  docker image ls
+  ```
+
+2. **Creating an container**
+
+- To create a container use the following command:
+
+  ```
+  docker run -itd -p 3000:5000 drajkata/hm_address_book
+  # you can set other port than 3000
+  ```
+
+- To check your container ID use the following command:
+  ```
+  docker container ls
+  ```
+
+2. **Run the application in the container**
+
+- To run the app in the container use the following command:
+
+  ```
+  docker exec -it [container_id] /bin/bash
+  # use bin/bash or bin/sh - it depends on your system, which command is correct
+  ```
+
+- To exit from your application use the following command:
+  ```
+  docker container ls
+  ```
+
+## Example of use
+
+**Example of restarting the program from the beginning**
+
+![Dosker_example](https://github.com/drajkata/goithomeworks/tree/main/Projects/AddressBook/Docker_example.png)
