@@ -1,7 +1,7 @@
 ## Setup - introduction
 
-If you are a developer, plese start instructions from [Stage 1](Stage 1 - Setup pipenv).
-If you are a user, please start instructions from [Stage 2](Stage 2 - Setup docker).
+If you are a developer, plese start instructions from [Stage 1](https://github.com/drajkata/goithomeworks/blob/main/Projects/AddressBook/README.md#stage-1---setup-pipenv).
+If you are a user, please start instructions from [Stage 2](https://github.com/drajkata/goithomeworks/blob/main/Projects/AddressBook/README.md#stage-2---setup-docker).
 
 ## Stage 1 - Setup pipenv
 
