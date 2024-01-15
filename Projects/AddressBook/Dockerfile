@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.11-alpine
 
 # Ustawiamy zmienną środowiskową
 ENV APP_HOME /app

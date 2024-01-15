@@ -1,3 +1,8 @@
+## Setup - introduction
+
+If you are a developer, plese start instructions from [Stage 1](Stage 1 - Setup pipenv).
+If you are a user, please start instructions from [Stage 2](Stage 2 - Setup docker).
+
 ## Stage 1 - Setup pipenv
 
 1. **Clone the Repository:**
@@ -56,43 +61,40 @@
      pipenv --where
      ```
 
-## Stage 2 - Setup docker
+Activate virtual environment with pipenv and go next to the Stage 2.
 
-Please, firstly run above instructions to activate virtual environment with pipenv. Then go through instructions below.
+## Stage 2 - Setup docker
 
 1. **Creating an image**
 
 - To create an image use the following command:
 
   ```
-  docker build . -t drajkata/hm_address_book
+  docker build . -t [your_profile_in_docker_hub]/[image_name]
   ```
-
-  You can name your image in a different way for example my_app or with flag -t [your_profile_in_docker_hub]/[name_of_your_up].
 
 - To check your images use the following command:
   ```
   docker image ls
   ```
 
-2. **Creating an container**
+2. **Spin up a new container **
 
-- To create a container use the following command:
+- To spin up a new container use the following command:
 
   ```
-  docker run -itd -p 3000:5000 drajkata/hm_address_book
+  docker run -it -t [your_profile_in_docker_hub]/[image_name]
   ```
 
-  You can set other port than 3000.
+  Note: "-t [your_profile_in_docker_hub]/[image_name]" is optionally, if you want to connect the image with Docker Hub.
+
+2. **Run the application from the running container**
 
 - To check your container ID use the following command:
   ```
   docker container ls
   ```
-
-2. **Run the application in the container**
-
-- To run the app in the container use the following command:
+- To use the container that is already running use the following command:
 
   ```
   docker exec -it [container_id] /bin/bash
@@ -109,4 +111,4 @@ Please, firstly run above instructions to activate virtual environment with pipe
 
 **Example of restarting the program from the beginning**
 
-![Docker_example](./Docker_example.png)
+![Docker_address_book](./Docker_address_book.png)
