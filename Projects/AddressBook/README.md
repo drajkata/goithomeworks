@@ -78,7 +78,7 @@ Activate virtual environment with pipenv and go next to the Stage 2.
   docker image ls
   ```
 
-2. **Spin up a new container **
+2. **Spin up a new container**
 
 - To spin up a new container use the following command:
 
@@ -88,7 +88,7 @@ Activate virtual environment with pipenv and go next to the Stage 2.
 
   Note: "-t [your_profile_in_docker_hub]/[image_name]" is optionally, if you want to connect the image with Docker Hub.
 
-2. **Run the application from the running container**
+3. **Run the application from the running container**
 
 - To check your container ID use the following command:
   ```
