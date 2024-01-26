@@ -24,20 +24,17 @@ def factorize_parallel(*numbers):
     parallel_time = time.time() - start_time
     return parallel_time, result
 
-if __name__ == '__main__':
-
-    # Wersja synchroniczna
+def main():
     (s_time, [a, b, c, d]) = factorize_synchronous(128, 255, 99999, 10651060)
-    print(f"\nWersja synchroniczna:\n\n{a}\n{b}\n{c}\n{d}\n")
+    print(f"\nSynchronous version:\n\n{a}\n{b}\n{c}\n{d}\n")
     assert a == [1, 2, 4, 8, 16, 32, 64, 128]
     assert b == [1, 3, 5, 15, 17, 51, 85, 255]
     assert c == [1, 3, 9, 41, 123, 271, 369, 813, 2439, 11111, 33333, 99999]
     assert d == [1, 2, 4, 5, 7, 10, 14, 20, 28, 35, 70, 140, 76079, 152158, 304316, 380395, 532553, 760790, 1065106, 1521580, 2130212, 2662765, 5325530, 10651060]
     print(f"Czas: {s_time} s\n")
 
-    # Wersja równoległa
     (p_time, [e, f, g, h]) = factorize_parallel(128, 255, 99999, 10651060)
-    print(f"Wersja równoległa:\n\n{e}\n{f}\n{g}\n{h}\n")
+    print(f"Parallel version:\n\n{e}\n{f}\n{g}\n{h}\n")
     assert e == [1, 2, 4, 8, 16, 32, 64, 128]
     assert f == [1, 3, 5, 15, 17, 51, 85, 255]
     assert g == [1, 3, 9, 41, 123, 271, 369, 813, 2439, 11111, 33333, 99999]
@@ -45,6 +42,10 @@ if __name__ == '__main__':
     print(f"Czas: {p_time} s\n")
 
     if p_time > s_time:
-        print("Wygląda na to, że wersja synchroniczna jest szybsza.\n")
+        print("It looks like the synchronous version is faster.\n")
     else:
-        print("Wygląda na to, że wersja równoległa jest szybsza.\n")
+        print("It looks like the parallel version is faster.\n")
+
+if __name__ == '__main__':
+    main()
+    

@@ -4,7 +4,14 @@ from pathlib import Path
 import shutil
 from concurrent.futures import ThreadPoolExecutor
 
-# Funkcja weryfikująca wprowadzone argumenty
+folders_dict = {
+        "audio": ['.MP3', '.OGG', '.WAV', '.AMR'],
+        "documents": ['.DOC', '.DOCX', '.TXT', '.PDF', '.XLSX', '.PPTX'],
+        "images": ['.JPEG', '.PNG', '.JPG', '.SVG'],
+        "video": ['.AVI', '.MP4', '.MOV', '.MKV'],
+        "archives": ['.ZIP', '.GZ', '.TAR'],
+    }
+
 def entrypoint():
     if len(sys.argv) == 1:
         print("No path entered.")
@@ -14,7 +21,6 @@ def entrypoint():
         path_to_organize = sys.argv[1]
         organize_files(Path(path_to_organize))
 
-# Funkcja usuwająca polskie znaki
 def normalize(text):
     translation_dict = str.maketrans('ĄąĆćĘęŁłÓóŚśŹźŻż', 'AaCcEeLlOoSsZzZz')
     text = text.translate(translation_dict)
@@ -22,7 +28,6 @@ def normalize(text):
     normalized_text = "".join(char if char.isalnum() else "_" for char in splitted_name[0])
     return normalized_text + splitted_name[1]
 
-# Worker organizujący pliki
 def organize_files_worker(args):
     p, folders_dict, files_list, known_extensions_list, unknown_extensions_list = args
 
@@ -66,15 +71,9 @@ def organize_files_worker(args):
                 files_list.append(str(i.name))
                 known_extensions_list.append(str(i.suffix))
 
-# Funkcja organizująca wszystkie pliki
+
 def organize_files(p):
-    folders_dict = {
-        "audio": ['.MP3', '.OGG', '.WAV', '.AMR'],
-        "documents": ['.DOC', '.DOCX', '.TXT', '.PDF', '.XLSX', '.PPTX'],
-        "images": ['.JPEG', '.PNG', '.JPG', '.SVG'],
-        "video": ['.AVI', '.MP4', '.MOV', '.MKV'],
-        "archives": ['.ZIP', '.GZ', '.TAR'],
-    }
+    global folders_dict
     files_list = []
     known_extensions_list = []
     unknown_extensions_list = []
