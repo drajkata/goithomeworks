@@ -7,6 +7,7 @@ from time import sleep
 import threading
 from datetime import datetime
 import json
+from http import HTTPStatus
 
 
 UDP_IP = "127.0.0.1"
@@ -18,7 +19,7 @@ class HttpHandler(BaseHTTPRequestHandler):
         data = self.rfile.read(int(self.headers['Content-Length']))
         # print(data)
         socket_run_client(UDP_IP, UDP_PORT, data)
-        self.send_response(302)
+        self.send_response(HTTPStatus.FOUND.value)
         self.send_header('Location', '/')
         self.end_headers()
 
@@ -32,9 +33,9 @@ class HttpHandler(BaseHTTPRequestHandler):
             if pathlib.Path().joinpath(pr_url.path[1:]).exists():
                 self.send_static()
             else:
-                self.send_html_file("./error.html", 404)
+                self.send_html_file("./error.html", HTTPStatus.NOT_FOUND.value)
 
-    def send_html_file(self, filename, status=200):
+    def send_html_file(self, filename, status=HTTPStatus.OK.value):
         self.send_response(status)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -42,7 +43,7 @@ class HttpHandler(BaseHTTPRequestHandler):
             self.wfile.write(fd.read())
 
     def send_static(self):
-        self.send_response(200)
+        self.send_response(HTTPStatus.OK.value)
         mt = mimetypes.guess_type(self.path)
         if mt:
             self.send_header("Content-type", mt[0])
