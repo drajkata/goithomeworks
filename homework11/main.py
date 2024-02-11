@@ -1,8 +1,13 @@
 from sqlite3 import Error
-from connection import create_connection, DB_NAME
+from connection import create_connection
+import os
+import faker
+from random import randint
+from datetime import datetime
+from variables import DB_NAME, DB_SCRIPT, NUMBER_SUBJECTS, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
 
 def create_tables(conn):
-    with open('school.sql', 'r') as f:
+    with open(DB_SCRIPT, 'r') as f:
         sql = f.read()
     cur = conn.cursor()
     try:
@@ -10,40 +15,29 @@ def create_tables(conn):
     except Error as e:
         print(e)
 
-def fill_data():
-    with open("fill_data_groups.py") as groups:
-        exec(groups.read())
-    with open("fill_data_students.py") as students:
-        exec(students.read())
-    with open("fill_data_lecturers.py") as lecturers:
-        exec(lecturers.read())
-    with open("fill_data_subjects.py") as subjects:
-        exec(subjects.read())
-    with open("fill_data_assessments.py") as assessments:
-        exec(assessments.read())
+def read_file(dir):
+        exec(
+            compile(open(dir, "rb").read(), dir, 'exec'),
+            globals(),
+            locals()
+        )
+
+def fill_data():  
+    read_file(os.path.abspath("fill_data_groups.py"))
+    read_file(os.path.abspath("fill_data_students.py"))
+    read_file(os.path.abspath("fill_data_lecturers.py"))
+    read_file(os.path.abspath("fill_data_subjects.py"))
+    read_file(os.path.abspath("fill_data_assessments.py"))
 
 def get_query(conn, sql_query):
     with open(sql_query, 'r') as q:
         query = q.read()
-    cur = conn.cursor()
+    c = conn.cursor()
     try:
-        cur.executescript(query)
+        c.execute(query)
     except Error as e:
         print(e)
-
-QUERY_DICT = {
-    "1" : "query_1.sql",
-    "2" : "query_2.sql",
-    "3" : "query_3.sql",
-    "4" : "query_4.sql",
-    "5" : "query_5.sql",
-    "6" : "query_6.sql",
-    "7" : "query_7.sql",
-    "8" : "query_8.sql",
-    "9" : "query_9.sql",
-    "10" : "query_10.sql",
-
-}
+    return c.fetchall()
 
 if __name__ == '__main__':
    
@@ -52,13 +46,16 @@ if __name__ == '__main__':
             create_tables(conn)
         else:
             print("Error! cannot create the database connection.")
-    fill_data()
-    while(True):
-        choice = input("\nEnter number of guery: ")
-        if choice in QUERY_DICT.keys():
-            get_query(conn, QUERY_DICT[choice])
-        elif choice.lower() in ["end", "exit", "."]:
-            break
-        else:
-            print("\nYou have entered an incorrect inquiry number. Enter a value from 1 to 10.")
-        print("\nTo exit the program, enter 'end', 'exit' or '.'\n")
+        fill_data()
+        while(True):
+            choice = input("\nEnter number of guery: ")
+            if choice in QUERY_DICT.keys():
+                print(f"\n{QUERY_DICT[choice][1]}\n")
+                for tuple in get_query(conn, QUERY_DICT[choice][0]):
+                    print(tuple)
+            elif choice.lower() in ["end", "exit", "."]:
+                print("\nGood bye!\n")
+                break
+            else:
+                print("\nYou have entered an incorrect inquiry number. Enter a value from 1 to 10.")
+            print("\nTo exit the program, enter 'end', 'exit' or '.'\n")

@@ -1,8 +1,7 @@
 import faker
 from sqlite3 import Error
-from connection import create_connection, DB_NAME
-
-NUMBER_LECTURERS = 5
+from connection import create_connection
+from variables import DB_NAME, NUMBER_SUBJECTS, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
 
 def generate_fake_data(numbers) -> list:
     fake_data = []

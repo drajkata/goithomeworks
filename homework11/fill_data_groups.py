@@ -1,18 +1,11 @@
 from sqlite3 import Error
-# from main import DB_NAME, create_connection
-from connection import create_connection, DB_NAME
-
-NUMBER_GROUPS = 3
-NUMBER_STUDENTS = 50
-NUMBER_SUBJECTS = 8
-NUMBER_LECTURERS = 5
-
-NUMBER_ASSESSMENT_PER_STUDENT = 20
+from connection import create_connection
+from variables import DB_NAME, NUMBER_SUBJECTS, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
 
 def generate_data(numbers) -> list:
     fake_groups = []
     for i in range(numbers):
-        letter = 'ABC'
+        letter = 'ABCDEFGHIJKLMNOPQRSTUWYZ'
         template_name = f"2022/2023-{letter[i]}"
         fake_groups.append(template_name)
     return fake_groups

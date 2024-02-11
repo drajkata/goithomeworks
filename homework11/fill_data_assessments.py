@@ -1,15 +1,10 @@
 from datetime import datetime
 from random import randint
 from sqlite3 import Error
-from connection import create_connection, DB_NAME
-
-
-NUMBER_STUDENTS = 50
-NUMBER_SUBJECTS = 8
-NUMBER_ASSESSMENTS_PER_STUDENT = 20
+from connection import create_connection
+from variables import DB_NAME, NUMBER_SUBJECTS, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
 
 def prepare_date(numbers) -> tuple:
-    global NUMBER_STUDENTS, NUMBER_SUBJECTS
     for_data = []
     
     for i in range(numbers):
