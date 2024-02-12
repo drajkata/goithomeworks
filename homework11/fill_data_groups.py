@@ -1,6 +1,6 @@
 from sqlite3 import Error
 from connection import create_connection
-from variables import DB_NAME, NUMBER_SUBJECTS, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
+from variables import DB_NAME, NUMBER_GROUPS
 
 def generate_data(numbers) -> list:
     fake_groups = []
@@ -30,7 +30,9 @@ def create_data(conn, groups) -> None:
     finally:
         cur.close()
 
+def create_groups(conn, numbers):
+    create_data(conn, prepare_date(generate_data(numbers)))
 
 if __name__ == '__main__':
     with create_connection(DB_NAME) as conn:
-        create_data(conn, prepare_date(generate_data(NUMBER_GROUPS)))
+        create_groups(conn, NUMBER_GROUPS)

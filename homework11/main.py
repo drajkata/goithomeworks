@@ -1,10 +1,11 @@
+from variables import DB_NAME, DB_SCRIPT, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
 from sqlite3 import Error
 from connection import create_connection
-import os
-import faker
-from random import randint
-from datetime import datetime
-from variables import DB_NAME, DB_SCRIPT, NUMBER_SUBJECTS, NUMBER_LECTURERS, NUMBER_GROUPS, NUMBER_STUDENTS, NUMBER_ASSESSMENTS_PER_STUDENT, QUERY_DICT, SUBJECTS_LIST
+from fill_data_groups import create_groups
+from fill_data_students import create_students
+from fill_data_lecturers import create_lecturers
+from fill_data_subjects import create_subjects
+from fill_data_assessments import create_assessments
 
 def create_tables(conn):
     with open(DB_SCRIPT, 'r') as f:
@@ -15,19 +16,12 @@ def create_tables(conn):
     except Error as e:
         print(e)
 
-def read_file(dir):
-        exec(
-            compile(open(dir, "rb").read(), dir, 'exec'),
-            globals(),
-            locals()
-        )
-
-def fill_data():  
-    read_file(os.path.abspath("fill_data_groups.py"))
-    read_file(os.path.abspath("fill_data_students.py"))
-    read_file(os.path.abspath("fill_data_lecturers.py"))
-    read_file(os.path.abspath("fill_data_subjects.py"))
-    read_file(os.path.abspath("fill_data_assessments.py"))
+def fill_tables(conn):
+    create_groups(conn, NUMBER_GROUPS)
+    create_students(conn, NUMBER_STUDENTS)
+    create_lecturers(conn, NUMBER_LECTURERS)
+    create_subjects(conn, SUBJECTS_LIST)
+    create_assessments(conn, NUMBER_ASSESSMENTS_PER_STUDENT)
 
 def get_query(conn, sql_query):
     with open(sql_query, 'r') as q:
@@ -46,7 +40,7 @@ if __name__ == '__main__':
             create_tables(conn)
         else:
             print("Error! cannot create the database connection.")
-        fill_data()
+        fill_tables(conn)
         while(True):
             choice = input("\nEnter number of guery: ")
             if choice in QUERY_DICT.keys():
