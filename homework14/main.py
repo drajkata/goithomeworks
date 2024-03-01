@@ -80,7 +80,6 @@ def main():
         process.crawl(AuthorsSpider)
         process.crawl(QuotesSpider)
         process.start()
-
         make_authors_json(csv_file_path_authors, json_file_path_authors)
         make_quotes_json(csv_file_path_quotes, json_file_path_quotes)
         seed_mongo_db() 
