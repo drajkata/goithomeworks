@@ -32,10 +32,8 @@ class AuthorForm(ModelForm):
 class QuoteForm(ModelForm):
 
     quote = CharField(required=True, widget=Textarea())
-    author = ChoiceField(required=True)
-    # author = ModelChoiceField(required=True, queryset=Author.objects.all())
 
     class Meta:
         model = Quote
-        fields = ["quote", "author"]
-        exclude = ["tags"]
+        fields = ["quote"]
+        exclude = ["tags", "author"]
