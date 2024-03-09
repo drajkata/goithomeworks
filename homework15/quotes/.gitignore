@@ -1,2 +1,2 @@
-quotes/settings.py
-quotes/_pycache_
+quotes/__pycache__/
+quotes/settings
