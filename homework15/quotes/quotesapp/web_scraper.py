@@ -1,24 +1,11 @@
 import scrapy
 from scrapy.crawler import CrawlerProcess
 
-
-CSV_FILE_PATH_AUTHORS = "data/authors.csv"
-CSV_FILE_PATH_QUOTES = "data/quotes.csv"
-CSV_FILE_PATH_TAGS = "data/tags.csv"
-
-JSON_FILE_PATH_AUTHORS = "data/authors.json"
-JSON_FILE_PATH_QUOTES = "data/quotes.json"
-JSON_FILE_PARH_TAGS = "data/tags.json"
-
 results_authors = []
 results_quotes = []
 
 class AuthorsSpider(scrapy.Spider):
     name = 'authors'
-    custom_settings = {
-        "FEED_FORMAT":"csv",
-        "FEED_URI": CSV_FILE_PATH_AUTHORS
-    }
     allowed_domains = ['quotes.toscrape.com']
     start_urls = ['http://quotes.toscrape.com']
     authors_links = set()
@@ -64,7 +51,6 @@ def new_data():
     process.crawl(QuotesSpider)
     process.start()
     return results_authors, results_quotes
-
 
 if __name__ == '__main__':
     new_data()
