@@ -11,7 +11,7 @@ class Author(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.fullname}"
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, null=False, unique=True)
@@ -25,4 +25,4 @@ class Quote(models.Model):
     tags = models.ManyToManyField(Tag)
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.quote}"

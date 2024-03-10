@@ -13,7 +13,7 @@
             <li><a href="{% url 'quotesapp:quote' %}" role="button">Add Quote</a></li>
             <li><a href="{% url 'quotesapp:author' %}" role="button">Add Author</a></li>
             <li><a href="{% url 'quotesapp:tag' %}" role="button">Add Tag</a></li>
-            <li><a href="{% url 'quotesapp:tag' %}" role="button">Import Data</a></li>
+            <li><a href="{% url 'quotesapp:import_data' %}" role="button">Import Data</a></li>
         </ul>
         <ul>
             <li>Welcome <b>{{ user.username }}!</b></li>
@@ -27,13 +27,21 @@
         {% endif %}
     </nav>
 
-    {% for q in quote %}
+    {% for q in page_obj %}
     <ul>
         <li>
-            <a href="{% url 'quotesapp:detailQuote' q.id %}"> {{ q.quote }} </a>
+            <a href="{% url 'quotesapp:detail_quote' q.id %}"> {{ q.quote }} </a>
         </li>
     </ul>
     {% endfor %}
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+    {% endif %}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
 </main>
 </body>
 </html>

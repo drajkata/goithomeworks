@@ -5,7 +5,7 @@
 {% block content %}
 
 <h1>{{quote.quote}}</h1>
-<p>Author: <a href="{% url 'quotesapp:detailAuthor' quote.author.id %}"> {{ quote.author.fullname }} </a></p>
+<p>Author: <a href="{% url 'quotesapp:detail_author' quote.author.id %}"> {{ quote.author.fullname }} </a></p>
 <p>Tags: <small>
     {{ quote.tags|tags }}
 </small></p>
