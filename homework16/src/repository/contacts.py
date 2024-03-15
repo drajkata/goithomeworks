@@ -51,7 +51,6 @@ async def update_contact(contact_id: int, body: ContactUpdate, db: Session) -> C
         db.commit()
     return contact
 
-# API powinno być w stanie pobrać listę kontaktów z datami urodzin na najbliższe 7 dni
 async def get_contacts_birthday_for_next_seven_days(skip: int, limit: int, db: Session) -> List[Contact]:
     today = datetime.now().date()
     next_week = today + timedelta(days=7)
