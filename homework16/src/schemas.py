@@ -7,7 +7,7 @@ class ContactIn(BaseModel):
     lastname: str = Field(max_length=50)
     email: str = Field(max_length=100)
     phone: str = Field(max_length=15)
-    birthday: date
+    birthday: date = None
     notes: str = Field(max_length=500)
 
     @validator('birthday', pre=True)
@@ -32,7 +32,7 @@ class ContactUpdate(BaseModel):
     lastname: Optional[str]
     email: Optional[str]
     phone: Optional[str]
-    birthday: Optional[date]
+    birthday: Optional[date] = None
     notes: Optional[str]
 
     @validator('birthday', pre=True)
