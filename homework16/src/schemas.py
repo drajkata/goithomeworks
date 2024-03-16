@@ -14,7 +14,7 @@ class ContactIn(BaseModel):
     def check_date_format(cls, birthday_date):
         if isinstance(birthday_date, str):
             if birthday_date == "":
-                return ""
+                return None
             try:
                 return date.fromisoformat(birthday_date)
             except ValueError:
@@ -39,7 +39,7 @@ class ContactUpdate(BaseModel):
     def check_date_format(cls, birthday_date):
         if isinstance(birthday_date, str):
             if birthday_date == "":
-                return ""
+                return None
             try:
                 return date.fromisoformat(birthday_date)
             except ValueError:
