@@ -49,6 +49,7 @@ async def update_contact(contact_id: int, body: ContactUpdate, db: Session) -> C
         if body.notes:
             contact.notes = body.notes
         db.commit()
+        db.refresh(contact)
     return contact
 
 async def get_contacts_birthday_for_next_seven_days(skip: int, limit: int, db: Session) -> List[Contact]:

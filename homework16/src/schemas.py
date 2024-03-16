@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date
 from pydantic import BaseModel, Field, validator
 from typing import Optional
 
@@ -7,17 +7,19 @@ class ContactIn(BaseModel):
     lastname: str = Field(max_length=50)
     email: str = Field(max_length=100)
     phone: str = Field(max_length=15)
-    birthday: date = Field()
+    birthday: date
     notes: str = Field(max_length=500)
 
     @validator('birthday', pre=True)
-    def check_date_format(cls, v):
-        if isinstance(v, str):
+    def check_date_format(cls, birthday_date):
+        if isinstance(birthday_date, str):
+            if birthday_date == "":
+                return ""
             try:
-                return date.fromisoformat(v)
+                return date.fromisoformat(birthday_date)
             except ValueError:
                 raise ValueError("Invalid date format. Required format: YYYY-MM-DD")
-        return v
+        return birthday_date
 
 class ContactOut(ContactIn):
     id: int
@@ -34,13 +36,15 @@ class ContactUpdate(BaseModel):
     notes: Optional[str]
 
     @validator('birthday', pre=True)
-    def check_date_format(cls, v):
-        if isinstance(v, str):
+    def check_date_format(cls, birthday_date):
+        if isinstance(birthday_date, str):
+            if birthday_date == "":
+                return ""
             try:
-                return date.fromisoformat(v)
+                return date.fromisoformat(birthday_date)
             except ValueError:
                 raise ValueError("Invalid date format. Required format: YYYY-MM-DD")
-        return v
+        return birthday_date
 
 class ContactDelete(ContactIn):
     id: int
