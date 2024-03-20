@@ -1,0 +1,8 @@
+alembic
+alembic.ini
+migrations
+src/__pycache__
+src/database/__pycache__
+src/repository/__pycache__
+src/routes/__pycache__
+src/services/__pycache__
