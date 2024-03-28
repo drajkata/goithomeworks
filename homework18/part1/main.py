@@ -20,16 +20,16 @@ user_agent_ban_list = [r"Gecko", r"Python-urllib"]
 
 app = FastAPI()
 
-# podejście z blokowaniem ip
-@app.middleware("http")
-async def ban_ips(request: Request, call_next: Callable):
-    ip = ip_address(request.client.host)
-    if ip in banned_ips:
-        return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "You are banned"})
-    response = await call_next(request)
-    return response
 
-# podejście z pozwoleniem konkretnych ip - używamy jednego albo drugiego podejścia
+# @app.middleware("http")
+# async def ban_ips(request: Request, call_next: Callable):
+#     ip = ip_address(request.client.host)
+#     if ip in banned_ips:
+#         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "You are banned"})
+#     response = await call_next(request)
+#     return response
+
+
 @app.middleware("http")
 async def limit_access_by_ip(request: Request, call_next: Callable):
     ip = ip_address(request.client.host)
