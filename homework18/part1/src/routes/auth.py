@@ -12,13 +12,14 @@ security = HTTPBearer()
 
 
 @router.post("/signup", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-async def signup(body: UserIn, db: Session = Depends(get_db)):
+async def signup(body: UserIn, background_tasks: BackgroundTasks, request: Request, db: Session = Depends(get_db)):
     exist_user = await repository_users.get_user_by_username(body.username, db)
     if exist_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, db)
-    return {"user": new_user, "detail": "User successfully created"}
+    background_tasks.add_task(send_email, new_user.email, new_user.username, request.base_url)
+    return {"user": new_user, "detail": "User successfully created. Check your email for confirmation."}
 
 
 @router.post("/login", response_model=TokenModel, status_code=status.HTTP_202_ACCEPTED)
@@ -53,15 +54,7 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@router.post("/signup", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-async def signup(body: UserIn, background_tasks: BackgroundTasks, request: Request, db: Session = Depends(get_db)):
-    exist_user = await repository_users.get_user_by_email(body.email, db)
-    if exist_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
-    body.password = auth_service.get_password_hash(body.password)
-    new_user = await repository_users.create_user(body, db)
-    background_tasks.add_task(send_email, new_user.user.email, new_user.user.username, request.base_url)
-    return {"user": new_user, "detail": "User successfully created. Check your email for confirmation."}
+
 
 
 @router.get('/confirmed_email/{token}')
