@@ -5,10 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from ipaddress import ip_address
 from typing import Callable
-
+from fastapi_limiter import FastAPILimiter
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
-import re
+from redis.asyncio import Redis
+from src.conf.config import settings
 
 origins = [
     "http://localhost:3000"
@@ -62,7 +63,11 @@ app.include_router(auth.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
 
 
-
+@app.on_event("startup")
+async def startup():
+    r = await Redis(host=settings.redis_host, port=settings.redis_port, db=0, encoding="utf-8",
+                    decode_responses=True)
+    await FastAPILimiter.init(r)
 
 
 @app.get("/")
